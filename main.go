@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{}
+var upgrade = websocket.Upgrader{}
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -15,12 +16,13 @@ func main() {
 	})
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		var conn, _ = upgrader.Upgrade(w, r, nil)
+		var conn, _ = upgrade.Upgrade(w, r, nil)
 		go func(conn *websocket.Conn) {
-			for {
+			ch := time.Tick(60 * time.Second)
+			for range ch {
 				mType, msg, _ := conn.ReadMessage()
-				fmt.Println("message", msg)
-				conn.WriteMessage(mType, msg)
+				fmt.Printf("type: %v, message: %v \n", mType, string(msg))
+				_ = conn.WriteMessage(mType, msg)
 			}
 		}(conn)
 	})
@@ -28,5 +30,5 @@ func main() {
 	fs := http.FileServer(http.Dir("static/"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	http.ListenAndServe(":3000", nil)
+	_ = http.ListenAndServe(":3000", nil)
 }
