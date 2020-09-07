@@ -12,7 +12,7 @@
 <script>
     const ws = new WebSocket("ws://localhost:3000/ws")
     ws.onmessage = (e) => console.info(e)
-    ws.onopen = () => console.info("open") && ws.send(`{"type":"message","data": "open"}`)
+    ws.onopen = () => ws.send(`{"type":"message","data": "open"}`)
     ws.onclose = () => console.info("close")
 </script>
 </html>
