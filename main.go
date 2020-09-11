@@ -8,6 +8,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+type Message struct {
+	Type   string `json:"type"`
+	Data   string `json:"data"`
+	Source string `json:"source"`
+}
+
 var upgrade = websocket.Upgrader{}
 
 func main() {
@@ -30,5 +36,6 @@ func main() {
 	fs := http.FileServer(http.Dir("static/"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
+	fmt.Println("listen: 3000")
 	_ = http.ListenAndServe(":3000", nil)
 }
