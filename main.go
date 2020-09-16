@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
-	"time"
+	"websocket/utils"
 
 	"github.com/gorilla/websocket"
 )
 
+// Message 发放的消息信息
 type Message struct {
 	Type   string `json:"type"`
 	Data   string `json:"data"`
@@ -22,15 +24,40 @@ func main() {
 	})
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		var conn, _ = upgrade.Upgrade(w, r, nil)
-		go func(conn *websocket.Conn) {
-			ch := time.Tick(60 * time.Second)
-			for range ch {
-				mType, msg, _ := conn.ReadMessage()
-				fmt.Printf("type: %v, message: %v \n", mType, string(msg))
-				_ = conn.WriteMessage(mType, msg)
+		var conn, err = upgrade.Upgrade(w, r, nil)
+		if err != nil {
+			log.Print("upgrade:", err)
+			return
+		}
+
+		defer conn.Close()
+
+		for {
+			msg := &Message{}
+			err := conn.ReadJSON(msg)
+			if err != nil {
+				log.Println("read: ", err)
+				break
 			}
-		}(conn)
+
+			log.Printf("recv: %v", msg)
+			result, err := utils.GetHTTP(msg.Data)
+			if err != nil || result.Code != 0 {
+				log.Printf("机器人回复失败：%v\n", err)
+				break
+			}
+
+			log.Println(result)
+			err = conn.WriteJSON(&Message{
+				Type:   "system",
+				Data:   result.Content,
+				Source: "system",
+			})
+			if err != nil {
+				log.Println("write:", err)
+				break
+			}
+		}
 	})
 
 	fs := http.FileServer(http.Dir("static/"))
