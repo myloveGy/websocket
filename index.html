@@ -1,104 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title>Document</title>
     <style>
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-      }
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
 
-      div#app {
-        width: 350px;
-        border: 1px solid red;
-        margin: 0 auto;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-      }
+        div#app {
+            width: 350px;
+            border: 1px solid red;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
 
-      .me {
-        color: green;
-        text-align: right;
-      }
+        .me {
+            color: green;
+            text-align: right;
+        }
 
-      .system {
-        color: orange;
-        text-align: left;
-      }
+        .system {
+            color: orange;
+            text-align: left;
+        }
 
-      .message {
-        padding: 5px;
-      }
+        .message {
+            padding: 5px;
+        }
 
-      .message-content {
-      }
+        .message-content {
+        }
 
-      .form {
-        flex: 1 1 auto;
-        height: 35px;
-      }
+        .form {
+            flex: 1 1 auto;
+            height: 35px;
+        }
     </style>
-  </head>
-  <body>
-    <div id="app">
-      <div class="message-content">
+</head>
+<body>
+<div id="app">
+    处理时间: {{time}} s
+    <div class="message-content">
         <div
-          v-for="item in data"
-          class="message"
-          :class="{'me': item.source == 'me', 'system': item.source != 'me'}"
+                v-for="item in data"
+                class="message"
+                :class="{'me': item.source == 'me', 'system': item.source != 'me'}"
         >
-          <span>{{item.data}}</span>
+            <span>{{item.data}}</span>
         </div>
-      </div>
-      <div class="form">
-        <form @submit.prevent.stop="submit">
-          <input type="text" v-model="message" />
-          <button type="submit">提交</button>
-        </form>
-      </div>
     </div>
-  </body>
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-  <script>
+    <div class="form">
+        <form @submit.prevent.stop="submit">
+            <input type="text" v-model="message"/>
+            <button type="submit">提交</button>
+            <button @click.stop.prevent="close" type="button">关闭</button>
+        </form>
+    </div>
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+
+    var heartbeat = null
     const ws = new WebSocket('ws://localhost:3000/ws')
     ws.onmessage = (e) => {
-      const { data } = e
-      console.info('data', 'data')
-      const json = JSON.parse(data)
-      json.source = 'system'
-      app.data.push(json)
+        const {data} = e
+        try {
+            const json = JSON.parse(data)
+            json.source = 'system'
+            app.data.push(json)
+        } catch (e) {
+            console.info("message error", e)
+        }
     }
 
-    ws.onopen = () => ws.send(`{"type":"message","data": "open"}`)
-    ws.onclose = () => console.info('close')
+    ws.onopen = () => {
+
+        ws.send(JSON.stringify({
+            type: "open",
+            data: "请求建立链接",
+        }))
+
+        app && (app.init = setInterval(() => {
+            app.time += 1
+        }, 1000))
+
+        // 30 秒发送心跳检测
+        !heartbeat && setInterval(() => {
+            ws && ws.readyState === 1 && ws.send(JSON.stringify({
+                type: "heartbeat",
+                data: "心跳检测"
+            }))
+
+            [2, 3].includes(ws.readyState) && clearInterval(heartbeat)
+        }, 3e4)
+    }
+
+    ws.onclose = () => {
+        console.info('close')
+        app && app.init && clearInterval(app.init)
+        heartbeat && clearInterval(heartbeat)
+    }
+
     const app = new Vue({
-      el: '#app',
-      data: {
-        data: [],
-        message: '',
-      },
-      methods: {
-        submit() {
-          const data = {
-            type: 'message',
-            data: this.message,
-          }
-
-          this.message = ''
-          this.data.push({
-            source: 'me',
-            ...data,
-          })
-
-          ws.send(JSON.stringify(data))
+        el: '#app',
+        data: {
+            data: [],
+            message: '',
+            time: 0,
+            init: false,
         },
-      },
+        methods: {
+            submit() {
+                const data = {
+                    type: 'message',
+                    data: this.message,
+                }
+
+                this.message = ''
+                this.data.push({
+                    source: 'me',
+                    ...data,
+                })
+
+                ws.send(JSON.stringify(data))
+            },
+            close() {
+                ws.send(JSON.stringify({
+                    type: "close",
+                    data: "不需要链接了"
+                }))
+            },
+        },
     })
-  </script>
+</script>
 </html>
