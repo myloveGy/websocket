@@ -14,24 +14,22 @@ export class Socket {
     // 授权信息
     auth: authData
 
-    // 授权请求
-    authRequest = 2
+    /** 
+     * 发送消息信息
+     */
+    public typeClientAuth: string = 'auth'  // 发送授权
+    public typeClientHeartbeat: string = 'heartbeat' // 发送心跳
+    public typeClientMessage: string = 'message' // 发送消息
+    public typeClientClose: string = 'close' // 发送主动关闭
+    public typeClientMessageReceipt: string = 'message receipt' // 发送消息回复
 
-    // 授权响应
-    authResponse = 3
-
-    // 服务器响应数据
-    serverReplyMsg = 6
-
-    // 连接端发送消息
-    clientSendMsg = 4
-
-    // 消息回执
-    clientSendHeartbeat = 0
-
-    // 消息类型
-    clientSendReceipt = 7
-
+    /**
+     * 回复消息
+     */
+    public typeServerAuth: string = 'auth response' // 授权回复
+    public typeServerMessage: string = 'message response' // 消息回复
+    public typeServerHeartbeat: string = 'heartbeat response' // 心跳回复
+  
     // 心跳检测
     heartbeatInterval: any = null
 
@@ -55,7 +53,7 @@ export class Socket {
     }
   
     // 开启事件
-    open = () => this.send(this.auth, this.authRequest)
+    open = () => this.send(this.auth, this.typeClientAuth)
   
     // 数据接收
     message = (e: MessageEvent) => {
@@ -69,11 +67,11 @@ export class Socket {
       const receiver = JSON.parse(e.data)
   
       // 授权成功发送的通知，表示可以正常通行，需要上报心跳了
-      if (receiver.type == this.authResponse) {
+      if (receiver.type == this.typeServerAuth) {
         this.heartbeatInterval = setInterval(() => {
             this.heartbeat() 
         }, 3e4)
-      } else if (receiver.type == this.serverReplyMsg) {
+      } else if (receiver.type == this.typeServerMessage) {
         // 服务器发送消息过来
         let data = JSON.parse(receiver.body)
         try {
@@ -85,12 +83,16 @@ export class Socket {
     }
   
     // 数据发送
-    send = (data:any, type:number = 4) => {
-      this.webSocket.send(JSON.stringify({type, data: JSON.stringify(data), time: Format(new Date(), "yyyy-MM-dd hh:mm:ss")}))
+    send = (data:any, type: string = '') => {
+      this.webSocket.send(JSON.stringify({
+        type: type || this.typeClientMessage, 
+        data: JSON.stringify(data), 
+        time: Format(new Date(), "yyyy-MM-dd hh:mm:ss")
+      }))
     }
   
     // 消息回执
-    messageReceipt = (message: any) => this.send({...message}, this.clientSendReceipt)
+    messageReceipt = (message: any) => this.send({...message}, this.typeClientMessageReceipt)
 
     // 关闭
     close = (e:CloseEvent) =>  {
@@ -102,7 +104,7 @@ export class Socket {
     }
   
     // 心跳
-    heartbeat = () => this.send({}, this.clientSendHeartbeat)
+    heartbeat = () => this.send({}, this.typeClientHeartbeat)
   
     // 调用处理函数
     callHandler = (body:any, receiver:any) => {
