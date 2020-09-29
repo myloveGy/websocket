@@ -19,11 +19,18 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
+import webSocket from '../ts/websocket'
 
 interface IMesage {
     source: string
     content: string
 }
+
+const socket = new webSocket("ws://localhost:3000/ws", {
+    sid: '123456',
+    access_token: "12121212",
+    url: "/"
+}, null)
 
 @Component
 export default class Home extends Vue {
@@ -39,6 +46,7 @@ export default class Home extends Vue {
         } 
 
         this.message = ''
+        socket.send(data)
         this.data.push(data)
     }
 }

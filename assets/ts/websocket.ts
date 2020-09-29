@@ -11,7 +11,7 @@ interface Window {
   socket: Socket
 }
 
-class Socket {
+export default class Socket {
     // socket 连接
     webSocket: WebSocket
 
@@ -25,14 +25,14 @@ class Socket {
     public typeClientHeartbeat: string = 'heartbeat' // 发送心跳
     public typeClientMessage: string = 'message' // 发送消息
     public typeClientClose: string = 'close' // 发送主动关闭
-    public typeClientMessageReceipt: string = 'message receipt' // 发送消息回复
+    public typeClientMessageReceipt: string = 'messageReceipt' // 发送消息回复
 
     /**
      * 回复消息
      */
-    public typeServerAuth: string = 'auth response' // 授权回复
-    public typeServerMessage: string = 'message response' // 消息回复
-    public typeServerHeartbeat: string = 'heartbeat response' // 心跳回复
+    public typeServerAuth: string = 'authResponse' // 授权回复
+    public typeServerMessage: string = 'messageResponse' // 消息回复
+    public typeServerHeartbeat: string = 'heartbeatResponse' // 心跳回复
   
     // 心跳检测
     heartbeatInterval: any = null
@@ -46,7 +46,7 @@ class Socket {
      * @param data 
      * @param handler 
      */
-    constructor(url: string, data: any, handler:any) {
+    constructor(url: string, data: IAuth, handler:any) {
       // ws地址
       this.webSocket = new WebSocket(url)
       this.webSocket.onmessage = this.message.bind(this)
@@ -75,14 +75,14 @@ class Socket {
         this.heartbeatInterval = setInterval(() => {
             this.heartbeat() 
         }, 3e4)
-      } else if (receiver.type == this.typeServerMessage) {
-        // 服务器发送消息过来
-        let data = JSON.parse(receiver.body)
-        try {
-          this.callHandler(data, receiver)
-        } catch (e) {
-          console.info(data.type + ' 执行函数不存在')
-        }
+      } 
+
+      // 服务器发送消息过来
+      let data = JSON.parse(receiver.body)
+      try {
+        this.callHandler(data, receiver)
+      } catch (e) {
+        console.info(data.type + ' 执行函数不存在')
       }
     }
   
