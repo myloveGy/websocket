@@ -4,90 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>WebSocket TypeScript Web Demo</title>
-  <style>
-
-    html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-    }
-
-    div#app {
-        width: 350px;
-        border: 1px solid red;
-        margin: 0 auto;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .me {
-        color: green;
-        text-align: right;
-    }
-
-    .system {
-        color: orange;
-        text-align: left;
-    }
-
-    .message {
-        padding: 5px;
-    }
-
-    .message-content {
-
-    }
-
-    .form {
-        flex: 1 1 auto;
-        height: 35px;
-    }
-
-</style>
+  <title>Vue WebSocket TypeScript Demo</title>
 </head>
 <body>
-  <div id="app">
-    <div class="message-content">
-        <div v-for="item in data" class="message"
-             :class="{'me': item.source == 'me', 'system': item.source != 'me'}">
-            <span>{{item.data}}</span>
-        </div>
-    </div>
-    <div class="form">
-        <form @submit.prevent.stop="submit">
-            <input type="text" v-model="message"/>
-            <button type="submit">提交</button>
-        </form>
-    </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script>
-    const app = new Vue({
-        el: "#app",
-        data: {
-            data: [],
-            message: "",
-        },
-        methods: {
-            submit() {
-                const data = {
-                    type: "message",
-                    data: this.message,
-                }
-
-                this.message = ''
-                this.data.push({
-                    source: "me",
-                    ...data,
-                })
-
-                ws.send(JSON.stringify(data))
-            }
-        }
-    })
-
-</script>
+    <div id="app"></div>
 </body>
 </html>
