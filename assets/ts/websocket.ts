@@ -48,6 +48,7 @@ export default class Socket {
      */
     constructor(url: string, data: IAuth, handler: any) {
         // ws地址
+        console.info('WebSocket Info: connection: ' + url)
         this.webSocket = new WebSocket(url)
         this.webSocket.onmessage = this.message.bind(this)
         this.webSocket.onclose = this.close.bind(this)
@@ -75,7 +76,6 @@ export default class Socket {
             this.heartbeatInterval = setInterval(() => {
                 this.heartbeat()
             }, 3e4)
-            return
         }
 
         this.callHandler(receiver)
@@ -99,7 +99,7 @@ export default class Socket {
             clearInterval(this.heartbeatInterval)
         }
 
-        console.log('connection closed (' + e.code + ')')
+        console.log('WebSocket Error: connection closed (' + e.code + ')')
     }
 
     // 心跳
@@ -110,7 +110,7 @@ export default class Socket {
         if (this.handler.hasOwnProperty(receiver.type)) {
             this.handler[receiver.type].call(this, receiver.data, receiver)
         } else {
-            console.error(`消息类型[${receiver.type}]未处理，消息内容:`, receiver.data)
+            console.error(`WebSocket Error: 消息类型[${receiver.type}]未处理，消息内容:`, receiver.data)
         }
     }
 }
