@@ -22,6 +22,7 @@ func main() {
 		}
 
 		str, _ := json.Marshal(info)
+		w.Header().Add("Content-Type", "application/json")
 		w.Write(str)
 	})
 
