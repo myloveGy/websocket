@@ -1,78 +1,87 @@
 <template>
-    <div class="content">
-        <div class="message-content">
-            <div 
-            v-for="(item, key) in data" 
-            class="message" :class="{'me': item.source == 'me', 'system': item.source != 'me'}"
-            :key="key"
-            >
-                <span>{{item.content}}</span>
-            </div>
-        </div>
-        <div class="form">
-            <form @submit.prevent.stop="submit">
-                <input type="text" v-model="message"/>
-                <button type="submit">提交</button>
-            </form>
-        </div>
+  <div class="content">
+    <div class="message-content">
+      <div
+          v-for="(item, key) in data"
+          class="message" :class="{'me': item.source === 'me', 'system': item.source !== 'me'}"
+          :key="key"
+      >
+        <span>{{ item.content }}</span>
+      </div>
     </div>
+    <div class="form">
+      <form @submit.prevent.stop="submit">
+        <input type="text" v-model="message"/>
+        <button type="submit">提交</button>
+      </form>
+    </div>
+  </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import {Component, Vue} from 'vue-property-decorator'
 import webSocket from '../ts/websocket'
 
 interface IMesage {
-    source: string
-    content: string
+  source: string
+  content: string
 }
-
-const socket = new webSocket("ws://localhost:3000/ws", {
-    sid: '123456',
-    access_token: "12121212",
-    url: "/"
-}, null)
 
 @Component
 export default class Home extends Vue {
 
-    data: Array<IMesage> = []
+  socket: any
 
-    message: string = ''
+  data: Array<IMesage> = []
 
-    submit() {
-        const data: IMesage = {
-            source: "me",
-            content: this.message,
-        } 
+  message: string = ''
 
-        this.message = ''
-        socket.send(data)
-        this.data.push(data)
+  created() {
+    this.socket = new webSocket("ws://localhost:3000/ws", {
+      sid: '123456',
+      access_token: "12121212",
+      url: "/"
+    }, {
+      messageResponse: (content: string) => this.data.push({
+        source: 'system',
+        content,
+      })
+    })
+  }
+
+  submit() {
+    const data: IMesage = {
+      source: "me",
+      content: this.message,
     }
+
+    this.message = ''
+    this.socket.send(data)
+    this.data.push(data)
+  }
 }
 </script>
 
-<style>
-    .content  {
-        background: red;
-    }
-    .me {
-        color: green;
-        text-align: right;
-    }
+<style lang="less">
+.content {
+  background: red;
+}
 
-    .system {
-        color: orange;
-        text-align: left;
-    }
+.me {
+  color: green;
+  text-align: right;
+}
 
-    .message {
-        padding: 5px;
-    }
+.system {
+  color: orange;
+  text-align: left;
+}
 
+.message {
+  padding: 5px;
+}
 
-    .form {
-        flex: 1 1 auto;
-        height: 35px;
-    }
+.form {
+  flex: 1 1 auto;
+  height: 35px;
+}
 </style>

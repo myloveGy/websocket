@@ -3,12 +3,6 @@
   "version": "1.0.0",
   "description": "学习项目",
   "main": "./index.js",
-  "scripts": {
-    "build:local": "webpack",
-    "start": "webpack-dev-server --mode=development --config ./build/webpack.config.js",
-    "build": "webpack --mode=production --config ./build/webpack.config.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/myloveGy/websocket.git"
@@ -20,24 +14,26 @@
     "url": "https://github.com/myloveGy/websocket/issues"
   },
   "homepage": "https://github.com/myloveGy/websocket#readme",
+  "scripts": {
+    "start": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "core-js": "^3.6.5",
+    "vue": "^2.6.11",
+    "vue-class-component": "^7.2.3",
+    "vue-property-decorator": "^8.4.2",
+    "vue-router": "^3.2.0",
+    "vuex": "^3.4.0"
+  },
   "devDependencies": {
-    "clean-webpack-plugin": "^3.0.0",
-    "css-loader": "^4.3.0",
-    "html-webpack-plugin": "^4.5.0",
-    "less": "^3.12.2",
-    "less-loader": "^7.0.1",
-    "ts-loader": "^8.0.4",
-    "typescript": "^4.0.3",
-    "uglifyjs-webpack-plugin": "^2.2.0",
-    "vue": "^2.6.12",
-    "vue-class-component": "^7.2.6",
-    "vue-loader": "^15.9.3",
-    "vue-property-decorator": "^9.0.0",
-    "vue-style-loader": "^4.1.2",
-    "vue-template-compiler": "^2.6.12",
-    "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0",
-    "webpack-merge": "^5.1.4"
+    "@vue/cli-plugin-babel": "^4.5.0",
+    "@vue/cli-plugin-typescript": "^4.5.0",
+    "@vue/cli-service": "^4.5.0",
+    "less": "^3.0.4",
+    "less-loader": "^5.0.0",
+    "typescript": "~3.9.3",
+    "vue-template-compiler": "^2.6.11"
   }
 }

@@ -1,15 +1,35 @@
 {
   "compilerOptions": {
-      "outDir": "./public/",
-      "sourceMap": true,
-      "strict": true,
-      "noImplicitReturns": true,
-      "module": "es2015",
-      "moduleResolution": "node",
-      "target": "es5",
-      "experimentalDecorators": true
+    "target": "esnext",
+    "module": "esnext",
+    "strict": true,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "types": [
+      "webpack-env"
+    ],
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ]
   },
   "include": [
-      "./assets/**/*"
+    "assets/**/*.ts",
+    "assets/**/*.tsx",
+    "assets/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }
