@@ -1,12 +1,13 @@
-package api
+package handler
 
 import (
 	"log"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 
-	"websocket/api/ws"
+	"websocket/api/handler/ws"
 )
 
 var upgrade = websocket.Upgrader{
@@ -16,15 +17,15 @@ var upgrade = websocket.Upgrader{
 }
 
 // WebSocket 处理websocket 信息
-func WebSocket(hub *ws.Hub, w http.ResponseWriter, r *http.Request) {
+func WebSocket(c *gin.Context) {
 
-	var conn, err = upgrade.Upgrade(w, r, nil)
+	var conn, err = upgrade.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Print("upgrade:", err)
 		return
 	}
 
-	client := &ws.Client{Hub: hub, Conn: conn, Send: make(chan interface{}, 256)}
+	client := &ws.Client{Hub: ws.GlobalHub, Conn: conn, Send: make(chan interface{}, 256)}
 	client.Hub.Register <- client
 
 	go client.WritePump()

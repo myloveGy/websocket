@@ -7,10 +7,6 @@ interface IAuth {
     url?: string
 }
 
-interface Window {
-    socket: Socket
-}
-
 export default class Socket {
     // socket 连接
     webSocket: WebSocket

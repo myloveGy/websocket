@@ -15,6 +15,12 @@ type Hub struct {
 	Unregister chan *Client
 }
 
+var GlobalHub *Hub
+
+func init() {
+	GlobalHub = NewHub()
+}
+
 // NewHub 创建Hub
 func NewHub() *Hub {
 	return &Hub{

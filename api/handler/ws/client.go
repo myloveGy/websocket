@@ -25,10 +25,13 @@ const (
 )
 
 type Client struct {
+	// 集合
 	Hub *Hub
 
+	// 连接
 	Conn *websocket.Conn
 
+	// 发送消息
 	Send chan interface{}
 }
 
@@ -80,7 +83,7 @@ func (c *Client) ReadPump() {
 		case global.ClientAuth: // 连接上
 			responseMessage = Message{
 				Type: global.ServerAuth,
-				Data: "已经建立链接，可以愉快的聊天了",
+				Data: "认证成功，已经建立链接",
 				Time: utils.DateTime(),
 			}
 		case global.ClientMessage:
@@ -97,8 +100,6 @@ func (c *Client) ReadPump() {
 				break
 			}
 
-			log.Println(result)
-
 			responseMessage = Message{
 				Type: global.ServerMessage,
 				Data: result.Content,
@@ -106,7 +107,7 @@ func (c *Client) ReadPump() {
 			}
 		}
 
-		c.Hub.Broadcast <- responseMessage
+		c.Send <- responseMessage
 	}
 }
 

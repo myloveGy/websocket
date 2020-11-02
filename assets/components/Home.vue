@@ -41,7 +41,7 @@ export default class Home extends Vue {
   disabled: boolean = true
 
   created() {
-    this.socket = new webSocket("ws://localhost:3000/ws", {
+    this.socket = new webSocket("ws://localhost:8080/ws", {
       sid: '123456',
       access_token: "12121212",
       url: "/"

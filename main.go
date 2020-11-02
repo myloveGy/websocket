@@ -1,39 +1,31 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"net/http"
-	"websocket/api"
-	"websocket/api/ws"
-	"websocket/utils"
+	"websocket/api/handler/ws"
+	"websocket/api/router"
+	"websocket/config"
 )
 
 func main() {
 
-	hub := ws.NewHub()
+	go ws.GlobalHub.Run()
 
-	go hub.Run()
+	// 开启调试模式
+	if config.App.Debug == "on" {
+		gin.SetMode("debug")
+	}
 
-	http.HandleFunc("/info", func(w http.ResponseWriter, request *http.Request) {
-		info := map[string]interface{}{
-			"clients": len(hub.Clients),
-			"time":    utils.DateTime(),
-		}
+	handler := router.NewRouter()
 
-		str, _ := json.Marshal(info)
-		w.Header().Add("Content-Type", "application/json")
-		w.Write(str)
-	})
+	s := &http.Server{
+		Addr:           config.App.Address,
+		Handler:        handler,
+		MaxHeaderBytes: 1 << 20,
+	}
 
-	// socket 处理
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		api.WebSocket(hub, w, r)
-	})
-
-	fs := http.FileServer(http.Dir("public/"))
-	http.Handle("/public/", http.StripPrefix("/public/", fs))
-
-	fmt.Println("listen: 3000")
-	_ = http.ListenAndServe(":3000", nil)
+	fmt.Println("Http Listen" + config.App.Address)
+	s.ListenAndServe()
 }

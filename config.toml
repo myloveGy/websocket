@@ -1,0 +1,33 @@
+env = "local"
+app_name = "GO Web Scoket"
+debug = "on"
+storage_path = "/data/app/"
+address = ":8080"
+static_url = "public/"
+
+[database]
+    [database.default]
+    enable = true
+    driver = "mysql"
+    dsn = ""
+    max_open_conns= 10
+    max_idle_conns = 5
+    show_sql = false
+
+[redis]
+    [redis.default]
+    server = ""
+    password = ""
+    db = 0
+
+    [redis.log]
+    server = ""
+    password = ""
+    db = 0
+
+[nsq]
+    [nsq.default]
+    host = ""
+    port = "4150"
+    init_size = 10
+    max_size = 100
