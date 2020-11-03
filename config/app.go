@@ -11,6 +11,16 @@ import (
 	config2 "websocket/pkg/config"
 )
 
+type Database struct {
+	Enable       bool   `toml:"enable" json:"enable"`
+	Driver       string `toml:"driver" json:"driver"`
+	Dsn          string `toml:"dsn" json:"dsn"`
+	MaxOpenConns int    `toml:"max_open_conns" json:"max_open_conns"`
+	MaxIdleConns int    `toml:"max_idle_conns" json:"max_idle_conns"`
+	MaxLifetime  int    `toml:"max_lefttime" json:"max_lefttime"`
+	ShowSql      bool   `toml:"show_sql" json:"show_sql"`
+}
+
 type Config struct {
 	AppName     string `toml:"app_name"`
 	StoragePath string `toml:"storage_path"`
@@ -23,6 +33,7 @@ type Config struct {
 	StartTime   time.Time
 	IsTesting   bool
 	PrivateKey  []byte
+	DB          map[string]*Database `toml:"database"` // 数据库信息
 }
 
 var App = &Config{

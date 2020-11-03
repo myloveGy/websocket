@@ -7,9 +7,12 @@ import (
 	"websocket/api/handler/ws"
 	"websocket/api/router"
 	"websocket/config"
+	"websocket/global"
 )
 
 func main() {
+
+	global.NewConnect("default")
 
 	go ws.GlobalHub.Run()
 

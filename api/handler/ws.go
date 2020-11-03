@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/gorilla/websocket"
 
 	"websocket/api/handler/ws"
+	"websocket/models"
 )
 
 var upgrade = websocket.Upgrader{
@@ -18,6 +20,18 @@ var upgrade = websocket.Upgrader{
 
 // WebSocket 处理websocket 信息
 func WebSocket(c *gin.Context) {
+
+	app := &models.App{AppId: c.Param("app_id")}
+	if err := app.Find(); err != nil {
+		response := map[string]interface{}{
+			"code":    500,
+			"message": "应用信息不存在: " + err.Error(),
+		}
+
+		fmt.Println("应用信息不存在: " + err.Error())
+		c.JSON(http.StatusOK, response)
+		return
+	}
 
 	var conn, err = upgrade.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {

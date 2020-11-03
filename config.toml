@@ -2,7 +2,7 @@ env = "local"
 app_name = "GO Web Scoket"
 debug = "on"
 storage_path = "/data/app/"
-address = ":8080"
+address = ":3000"
 static_url = "public/"
 
 [database]

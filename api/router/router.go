@@ -23,7 +23,7 @@ func NewRouter() *gin.Engine {
 	// websocket 处理
 	webSocket := r.Group("/ws")
 	{
-		webSocket.GET("/", handler.WebSocket)
+		webSocket.GET("/:app_id", handler.WebSocket)
 		webSocket.POST("/push/user", handler.MessagePush)  // 发送到指定用户
 		webSocket.POST("/push/many", handler.MessagePush)  // 发送到多个用户
 		webSocket.POST("/push/all", handler.MessagePush)   // 发送到全部用户
