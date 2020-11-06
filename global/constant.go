@@ -12,4 +12,8 @@ const (
 	ServerMessage   = "messageResponse"   // 消息回复
 	ServerHeartbeat = "heartbeatResponse" // 心跳回复
 	ServerAuth      = "authResponse"      // 授权回复
+
+	// 应用状态
+	AppStatusActivate = 1 // 状态启用
+	AppStatusDisabled = 4 // 停用
 )

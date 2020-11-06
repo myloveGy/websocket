@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"websocket/global"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -21,14 +21,38 @@ var upgrade = websocket.Upgrader{
 // WebSocket 处理websocket 信息
 func WebSocket(c *gin.Context) {
 
+	var response map[string]interface{}
+	// 验证参数
+	appId := c.Param("app_id")
+	if appId == "" {
+		response = map[string]interface{}{
+			"code":    500,
+			"message": "传递参数错误",
+		}
+
+		c.JSON(http.StatusOK, response)
+		return
+	}
+
+	// 查询应用信息
 	app := &models.App{AppId: c.Param("app_id")}
 	if err := app.Find(); err != nil {
-		response := map[string]interface{}{
+		response = map[string]interface{}{
 			"code":    500,
 			"message": "应用信息不存在: " + err.Error(),
 		}
 
-		fmt.Println("应用信息不存在: " + err.Error())
+		c.JSON(http.StatusOK, response)
+		return
+	}
+
+	// 验证应用状态
+	if app.Status != global.AppStatusActivate {
+		response = map[string]interface{}{
+			"code":    500,
+			"message": "应用信息已经被停用",
+		}
+
 		c.JSON(http.StatusOK, response)
 		return
 	}

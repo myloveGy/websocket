@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"crypto/md5"
 	"fmt"
+	"io"
 	"sort"
 	"strconv"
 	"strings"
@@ -29,10 +31,6 @@ func MapToString(data map[string]interface{}) string {
 		switch data[v].(type) {
 		case bool:
 			resultString += strconv.FormatBool(data[v].(bool))
-		case float32:
-			resultString += strconv.FormatFloat(float64(data[v].(float32)), 'f', 2, 32)
-		case float64:
-			resultString += strconv.FormatFloat(data[v].(float64), 'f', 2, 64)
 		case int:
 			resultString += strconv.Itoa(data[v].(int))
 		case int64:
@@ -47,4 +45,12 @@ func MapToString(data map[string]interface{}) string {
 	}
 
 	return strings.Trim(resultString, "&")
+}
+
+func Sign(data map[string]interface{}, Secret string) string {
+	linkString := MapToString(data)
+	w := md5.New()
+	_, _ = io.WriteString(w, linkString+Secret)
+	fmt.Println("link", linkString+Secret)
+	return fmt.Sprintf("%x", w.Sum(nil))
 }

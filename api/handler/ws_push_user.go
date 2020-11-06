@@ -2,24 +2,21 @@ package handler
 
 import (
 	"net/http"
+	"websocket/api/response"
 
 	"github.com/gin-gonic/gin"
 )
 
+// 请求数据
 type Params struct {
 	SessionId string `form:"session_id" json:"session_id" binding:"required"`
-	UserName  string `form:"username" json:"username" binding:"required"`
+	Data      string `form:"data" json:"data" binding:"required"`
 }
 
-func MessagePush(context *gin.Context) {
+func WsPushUser(context *gin.Context) {
 	params := &Params{}
 	if err := context.ShouldBind(params); err != nil {
-		context.JSON(http.StatusOK, gin.H{
-			"code":    "Middleware Request error",
-			"message": "请求参数错误",
-		})
-
-		context.Abort()
+		response.NewResponseError(context, "PushUserError", "请求参数错误")
 		return
 	}
 

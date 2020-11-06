@@ -27,10 +27,10 @@ func NewRouter() *gin.Engine {
 	push := r.Group("/ws/push")
 	push.Use(middleware.Sign())
 	{
-		push.POST("/user", handler.MessagePush)  // 发送到指定用户
-		push.POST("/many", handler.MessagePush)  // 发送到多个用户
-		push.POST("/all", handler.MessagePush)   // 发送到全部用户
-		push.POST("/group", handler.MessagePush) // 发送到指定用户
+		push.POST("/user", handler.WsPushUser)  // 发送到指定用户
+		push.POST("/many", handler.WsPushUser)  // 发送到多个用户
+		push.POST("/all", handler.WsPushUser)   // 发送到全部用户
+		push.POST("/group", handler.WsPushUser) // 发送到指定用户
 	}
 
 	// 前端文件

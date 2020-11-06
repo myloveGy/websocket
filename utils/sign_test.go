@@ -74,3 +74,34 @@ func TestGetMapStringSort(t *testing.T) {
 		})
 	}
 }
+
+func TestSign(t *testing.T) {
+	type args struct {
+		data   map[string]interface{}
+		Secret string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "测试加密",
+			args: args{
+				data: map[string]interface{}{
+					"username": "456",
+					"age":      "789",
+				},
+				Secret: "456",
+			},
+			want: "11a03d0d4ab530e0c5b406b05d9af076",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Sign(tt.args.data, tt.args.Secret); got != tt.want {
+				t.Errorf("Sign() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
