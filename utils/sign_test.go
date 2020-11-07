@@ -30,11 +30,14 @@ func TestMapToString(t *testing.T) {
 				"a":       int(1),
 				"b":       int8(8),
 				"c":       int32(32),
+				"de":      int64(1),
+				"bb":      false,
 				"d":       float32(2.00),
 				"e":       float64(5.00),
 				"my_name": "jinxing.liu",
+				"sign":    "abcde",
 			}},
-			want: "a=1&b=8&c=32&d=2.00&e=5.00&my_name=jinxing.liu",
+			want: "a=1&b=8&bb=false&c=32&d=2&de=1&e=5&my_name=jinxing.liu",
 		},
 	}
 	for _, tt := range tests {
