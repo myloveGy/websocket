@@ -25,6 +25,7 @@ func NewRouter() *gin.Engine {
 	r.GET("/ws/:app_id", handler.WebSocket)
 
 	push := r.Group("/ws/push")
+	push.Use(middleware.Translations())
 	push.Use(middleware.Sign())
 	{
 		push.POST("/user", handler.WsPushUser)  // 发送到指定用户

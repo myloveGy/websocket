@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 
-	config "websocket/config"
+	"websocket/config"
 )
 
 var DB *sqlx.DB
@@ -21,7 +21,7 @@ func NewConnect(defaultConfig string) {
 		log.Fatalln(errors.New(defaultConfig + ": 数据库配置为空"))
 	}
 
-	fmt.Printf("configValue.Driver = %s, configValue.Dsn = %s", configValue.Driver, configValue.Dsn)
+	fmt.Printf("Mysql: configValue.Driver = %s, configValue.Dsn = %s \n", configValue.Driver, configValue.Dsn)
 	db, err := sqlx.Connect(configValue.Driver, configValue.Dsn)
 	if err != nil {
 		fmt.Println("error: ", err)

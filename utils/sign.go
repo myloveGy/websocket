@@ -51,6 +51,5 @@ func Sign(data map[string]interface{}, Secret string) string {
 	linkString := MapToString(data)
 	w := md5.New()
 	_, _ = io.WriteString(w, linkString+Secret)
-	fmt.Println("link", linkString+Secret)
 	return fmt.Sprintf("%x", w.Sum(nil))
 }

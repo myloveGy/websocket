@@ -93,10 +93,11 @@ func load(args map[string]string) {
 	// load config
 	conf, err := config2.LoadFile(filepath.Join(App.Path, "config.toml"))
 	mustCheckError(err)
-	if !App.IsTesting {
-		err = conf.Env(filepath.Join(App.Path, ".env"))
-		mustCheckError(err)
-	}
+
+	// 加载 env 文件
+	err = conf.Env(filepath.Join(App.Path, ".env"))
+	mustCheckError(err)
+
 	err = conf.Unmarshal(App)
 	mustCheckError(err)
 
