@@ -53,3 +53,13 @@ func Sign(data map[string]interface{}, Secret string) string {
 	_, _ = io.WriteString(w, linkString+Secret)
 	return fmt.Sprintf("%x", w.Sum(nil))
 }
+
+func VerifyEmptyKeys(data map[string]interface{}, keys []string) (string, bool) {
+	for _, v := range keys {
+		if _, ok := data[v]; !ok {
+			return v, true
+		}
+	}
+
+	return "", false
+}

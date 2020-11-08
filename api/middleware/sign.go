@@ -29,7 +29,7 @@ func Sign() gin.HandlerFunc {
 		}
 
 		// 验证必须传递 app_id time, sign
-		if emptyKey, isEmpty := verifyEmptyKeys(data, []string{"app_id", "time", "sign"}); isEmpty {
+		if emptyKey, isEmpty := utils.VerifyEmptyKeys(data, []string{"app_id", "time", "sign"}); isEmpty {
 			response.NewResponseError(context, "SignError", "参数:"+emptyKey+" is empty")
 			return
 		}
@@ -60,14 +60,4 @@ func Sign() gin.HandlerFunc {
 		context.Set("app", app)
 		context.Next()
 	}
-}
-
-func verifyEmptyKeys(data map[string]interface{}, keys []string) (string, bool) {
-	for _, v := range keys {
-		if _, ok := data[v]; !ok {
-			return v, true
-		}
-	}
-
-	return "", false
 }

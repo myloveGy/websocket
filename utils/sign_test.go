@@ -108,3 +108,47 @@ func TestSign(t *testing.T) {
 		})
 	}
 }
+
+func TestVerifyEmptyKeys(t *testing.T) {
+	type args struct {
+		data map[string]interface{}
+		keys []string
+	}
+	tests := []struct {
+		name  string
+		args  args
+		want  string
+		want1 bool
+	}{
+		{
+			name: "测试一",
+			args: args{data: map[string]interface{}{
+				"username": "age",
+				"age":      20,
+				"time":     "2020-02-20 11:00:11",
+			}, keys: []string{"username", "age", "time"}},
+			want:  "",
+			want1: false,
+		},
+		{
+			name: "测试二",
+			args: args{data: map[string]interface{}{
+				"username": "age",
+				"time":     "2020-02-20 11:00:11",
+			}, keys: []string{"username", "age", "time"}},
+			want:  "age",
+			want1: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, got1 := VerifyEmptyKeys(tt.args.data, tt.args.keys)
+			if got != tt.want {
+				t.Errorf("VerifyEmptyKeys() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("VerifyEmptyKeys() got1 = %v, want %v", got1, tt.want1)
+			}
+		})
+	}
+}
