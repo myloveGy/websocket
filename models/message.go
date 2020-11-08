@@ -15,6 +15,7 @@ type Message struct {
 
 // 创建
 func (m *Message) Create(db *sqlx.DB) error {
+	m.CreatedAt = time.Now()
 	result, err := db.Exec(
 		"INSERT INTO `message` (`app_id`, `type`, `content`, `created_at`) VALUES (?, ?, ?, ?)",
 		m.AppId,
@@ -27,11 +28,7 @@ func (m *Message) Create(db *sqlx.DB) error {
 	}
 
 	m.MessageId, err = result.LastInsertId()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // 删除数据

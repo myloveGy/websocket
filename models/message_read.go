@@ -31,6 +31,8 @@ func (m *MessageRead) FindAll(db *sqlx.DB) ([]*MessageRead, error) {
 
 // 创建
 func (m *MessageRead) Create(db *sqlx.DB) error {
+	m.CreatedAt = time.Now()
+	m.UpdatedAt = m.CreatedAt
 	result, err := db.Exec(
 		"INSERT INTO `message_read` (`message_id`, `app_id`, `user_id`, `group_id`, `created_at`, `updated_at`) VALUES (?, ?, ?, ?, ?, ?)",
 		m.MessageId,

@@ -25,6 +25,9 @@ const (
 )
 
 type Client struct {
+	// 用户信息
+	UserId string
+
 	// 集合
 	Hub *Hub
 

@@ -63,7 +63,13 @@ func WebSocket(c *gin.Context) {
 		return
 	}
 
-	client := &ws.Client{Hub: ws.GlobalHub, Conn: conn, Send: make(chan interface{}, 256)}
+	client := &ws.Client{
+		Hub:    ws.GlobalHub,
+		Conn:   conn,
+		Send:   make(chan interface{}, 256),
+		UserId: "1",
+	}
+
 	client.Hub.Register <- client
 
 	go client.WritePump()

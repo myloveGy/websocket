@@ -16,9 +16,9 @@ func NewRouter() *gin.Engine {
 	// api
 	api := r.Group("/api")
 	{
-		api.GET("/info", handler.ApiInfo)      // 详情信息
-		api.POST("/login", handler.ApiLogin)   // 用户登录
-		api.POST("/verify", handler.ApiVerify) // 验证登录
+		api.GET("/info", handler.ApiInfo) // 详情信息
+		api.POST("/info", handler.ApiInfo)
+		api.POST("/login", handler.ApiLogin) // 用户登录
 	}
 
 	// websocket 处理

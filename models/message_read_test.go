@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"testing"
-	"time"
 	"websocket/global"
 )
 
@@ -28,8 +27,6 @@ func TestMessageRead_Create(t *testing.T) {
 				MessageId: 1,
 				UserId:    "1",
 				GroupId:   "",
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
 			},
 			args: args{
 				db: global.DB,
