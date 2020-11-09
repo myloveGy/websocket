@@ -7,7 +7,7 @@ import (
 )
 
 type App struct {
-	Id        int       `db:"id"`
+	Id        int64     `db:"id"`
 	AppId     string    `db:"app_id"`
 	AppSecret string    `db:"app_secret"`
 	AppName   string    `db:"app_name"`

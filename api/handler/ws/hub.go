@@ -1,6 +1,9 @@
 package ws
 
-import "sync"
+import (
+	"sync"
+	"websocket/models"
+)
 
 // Hub 维护一组活动客户端，并发
 type Hub struct {
@@ -10,11 +13,7 @@ type Hub struct {
 	// 在线数链接数
 	OnlineClient int64
 
-	/**
-	 * 连接用户信息
-	 * 可能一个用户两个链接(手机端、网页端) {'user_id': [client1, client2]}
-	 */
-	Users map[string][]*Client
+	Apps map[int64]*App
 
 	// 注册来自客户端的请求。
 	Register chan *Client
@@ -34,33 +33,22 @@ func NewHub() *Hub {
 	return &Hub{
 		Register:   make(chan *Client),
 		Unregister: make(chan *Client),
-		Users:      make(map[string][]*Client),
+		Apps:       make(map[int64]*App),
 	}
 }
 
-func (h *Hub) registerUser(c *Client) {
+func (h *Hub) CreateApp(app *models.App) {
 
 	h.mu.Lock()
 
-	if h.Users == nil {
-		h.Users = make(map[string][]*Client)
+	if h.Apps == nil {
+		h.Apps = make(map[int64]*App)
 	}
 
-	h.Users[c.UserId] = append(h.Users[c.UserId], c)
-
-	h.mu.Unlock()
-}
-
-func (h *Hub) unRegisterUser(c *Client) {
-	h.mu.Lock()
-	var tmpUsers []*Client
-	for _, v := range h.Users[c.UserId] {
-		if v != c {
-			tmpUsers = append(tmpUsers, v)
-		}
+	if _, ok := h.Apps[app.Id]; !ok {
+		h.Apps[app.Id] = NewApp(app)
 	}
 
-	h.Users[c.UserId] = tmpUsers
 	h.mu.Unlock()
 }
 
@@ -70,12 +58,15 @@ func (h *Hub) Run() {
 
 		case client := <-h.Register:
 			// 注册链接
-			h.registerUser(client)
+			h.CreateApp(client.App)
+			if v, ok := h.Apps[client.App.Id]; ok {
+				v.register(client)
+			}
+
 			h.OnlineClient += 1
 		case client := <-h.Unregister:
-			// 取消链接
-			if _, ok := h.Users[client.UserId]; ok {
-				h.unRegisterUser(client)
+			if v, ok := h.Apps[client.App.Id]; ok {
+				v.unRegister(client)
 				close(client.Send)
 				h.OnlineClient -= 1
 			}

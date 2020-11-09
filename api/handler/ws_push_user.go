@@ -34,58 +34,60 @@ func WsPushUser(context *gin.Context) {
 		return
 	}
 
-	if value, ok := ws.GlobalHub.Users[params.UserId]; ok {
-		for _, client := range value {
-			client.Send <- ws.Message{
-				Type: global.ClientMessage,
-				Data: params.Content,
-				Time: utils.DateTime(),
+	if value, ok := ws.GlobalHub.Apps[appModel.Id]; ok {
+		if user, ok1 := value.Users[params.UserId]; ok1 {
+			for _, client := range user {
+				client.Send <- ws.Message{
+					Type: global.ClientMessage,
+					Data: params.Content,
+					Time: utils.DateTime(),
+				}
 			}
-		}
 
-		// 响应数据
-		context.JSON(http.StatusOK, map[string]interface{}{
-			"online":     true,
-			"user_id":    params.UserId,
-			"content":    params.Content,
-			"type":       params.Type,
-			"created_at": utils.DateTime(),
-		})
-	} else {
-		// 添加数据入库
-		m := &models.Message{
-			Content: params.Content,
-			Type:    params.Type,
-			AppId:   appModel.Id,
+			// 响应数据
+			context.JSON(http.StatusOK, map[string]interface{}{
+				"online":     true,
+				"user_id":    params.UserId,
+				"content":    params.Content,
+				"type":       params.Type,
+				"created_at": utils.DateTime(),
+			})
 		}
-
-		// 添加消息
-		if err := m.Create(global.DB); err != nil {
-			response.NewResponseError(context, "PushUserError", "添加消息失败")
-			return
-		}
-
-		// 添加用户消息
-		mRead := &models.MessageRead{
-			AppId:     m.AppId,
-			MessageId: m.MessageId,
-			UserId:    params.UserId,
-		}
-
-		if err := mRead.Create(global.DB); err != nil {
-			response.NewResponseError(context, "PushUserError", "添加用户消息失败")
-			return
-		}
-
-		// 响应数据
-		context.JSON(http.StatusOK, map[string]interface{}{
-			"online":     false,
-			"id":         mRead.Id,
-			"message_id": mRead.MessageId,
-			"user_id":    params.UserId,
-			"content":    params.Content,
-			"type":       params.Type,
-			"created_at": utils.DateTime(),
-		})
 	}
+
+	// 添加数据入库
+	m := &models.Message{
+		Content: params.Content,
+		Type:    params.Type,
+		AppId:   appModel.Id,
+	}
+
+	// 添加消息
+	if err := m.Create(global.DB); err != nil {
+		response.NewResponseError(context, "PushUserError", "添加消息失败")
+		return
+	}
+
+	// 添加用户消息
+	mRead := &models.MessageRead{
+		AppId:     m.AppId,
+		MessageId: m.MessageId,
+		UserId:    params.UserId,
+	}
+
+	if err := mRead.Create(global.DB); err != nil {
+		response.NewResponseError(context, "PushUserError", "添加用户消息失败")
+		return
+	}
+
+	// 响应数据
+	context.JSON(http.StatusOK, map[string]interface{}{
+		"online":     false,
+		"id":         mRead.Id,
+		"message_id": mRead.MessageId,
+		"user_id":    params.UserId,
+		"content":    params.Content,
+		"type":       params.Type,
+		"created_at": utils.DateTime(),
+	})
 }

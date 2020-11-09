@@ -3,6 +3,7 @@ package ws
 import (
 	"log"
 	"time"
+	"websocket/models"
 
 	"github.com/gorilla/websocket"
 
@@ -25,6 +26,8 @@ const (
 )
 
 type Client struct {
+	App *models.App
+
 	// 用户信息
 	UserId string
 
@@ -35,7 +38,8 @@ type Client struct {
 	Conn *websocket.Conn
 
 	// 发送消息
-	Send chan interface{}
+	Send chan interface {
+	}
 }
 
 // Message 发放的消息信息

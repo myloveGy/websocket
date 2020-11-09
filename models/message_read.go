@@ -8,7 +8,7 @@ import (
 type MessageRead struct {
 	Id        int64     `db:"id" json:"id"`
 	MessageId int64     `db:"message_id" json:"message_id"`
-	AppId     int       `db:"app_id" json:"app_id"`
+	AppId     int64     `db:"app_id" json:"app_id"`
 	UserId    string    `db:"user_id" json:"user_id"`
 	GroupId   string    `db:"group_id" json:"group_id"`
 	Status    int       `db:"status" json:"status"`
