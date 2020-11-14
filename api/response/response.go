@@ -13,5 +13,8 @@ type responseError struct {
 // 返回错误
 func NewResponseError(c *gin.Context, code, message string) {
 	c.JSON(http.StatusOK, responseError{Code: code, Message: message})
-	c.Abort()
+}
+
+func Success(c *gin.Context, data interface{}) {
+	c.JSON(http.StatusOK, data)
 }

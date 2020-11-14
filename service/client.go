@@ -1,4 +1,4 @@
-package ws
+package service
 
 import (
 	"log"
@@ -44,9 +44,9 @@ type Client struct {
 
 // Message 发放的消息信息
 type Message struct {
-	Type string `json:"type"`
-	Data string `json:"data"`
-	Time string `json:"time"`
+	Type    string `json:"type"`
+	Content string `json:"content,omitempty"`
+	Time    string `json:"time"`
 }
 
 func (c *Client) ReadPump() {
@@ -76,41 +76,35 @@ func (c *Client) ReadPump() {
 
 		switch msg.Type {
 		// 心跳检测
-		case global.ClientHeartbeat:
+		case global.SocketHeartbeat:
 			responseMessage = Message{
-				Type: global.ServerHeartbeat,
+				Type: global.SocketHeartbeat,
 				Time: utils.DateTime(),
 			}
 
 			// 关闭链接
-		case global.ClientClose: // 关闭链接
+		case global.SocketClose: // 关闭链接
 			log.Printf("close: %v", msg)
 			_ = c.Conn.Close()
 			break
-		case global.ClientAuth: // 连接上
-			responseMessage = Message{
-				Type: global.ServerAuth,
-				Data: "认证成功，已经建立链接",
-				Time: utils.DateTime(),
-			}
-		case global.ClientMessage:
-			result, err := utils.GetHTTP(msg.Data)
+		case global.SocketMessage:
+			result, err := utils.GetHTTP(msg.Content)
 			if err != nil || result.Code != 0 {
 				log.Printf("机器人回复失败：%v\n", err)
 
 				responseMessage = Message{
-					Type: global.ServerMessage,
-					Data: "机器人回复失败",
-					Time: utils.DateTime(),
+					Type:    global.SocketMessage,
+					Content: "机器人回复失败",
+					Time:    utils.DateTime(),
 				}
 
 				break
 			}
 
 			responseMessage = Message{
-				Type: global.ServerMessage,
-				Data: result.Content,
-				Time: utils.DateTime(),
+				Type:    global.SocketMessage,
+				Content: result.Content,
+				Time:    utils.DateTime(),
 			}
 		}
 

@@ -1,26 +1,21 @@
-package handler
+package push
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
-	"websocket/api/handler/ws"
 	"websocket/api/response"
 	"websocket/global"
 	"websocket/models"
+	"websocket/request"
+	"websocket/service"
 	"websocket/utils"
-
-	"github.com/gin-gonic/gin"
 )
 
-// 请求数据
-type Params struct {
-	UserId  string `json:"user_id" binding:"required"`
-	Content string `json:"content" binding:"required"`
-	Type    int    `json:"type" binding:"required,oneof=1 2"`
-}
+type Push struct{}
 
-func WsPushUser(context *gin.Context) {
+func (p *Push) User(context *gin.Context) {
 	// 验证绑定数据
-	params := &Params{}
+	params := &request.UserParams{}
 	if isError, err := utils.BindAndValid(context, params); isError {
 		response.NewResponseError(context, "PushUserError", "请求参数错误:"+err.Error())
 		return
@@ -34,13 +29,13 @@ func WsPushUser(context *gin.Context) {
 		return
 	}
 
-	if value, ok := ws.GlobalHub.Apps[appModel.Id]; ok {
+	if value, ok := service.GlobalHub.Apps[appModel.Id]; ok {
 		if user, ok1 := value.Users[params.UserId]; ok1 {
 			for _, client := range user {
-				client.Send <- ws.Message{
-					Type: global.ClientMessage,
-					Data: params.Content,
-					Time: utils.DateTime(),
+				client.Send <- service.Message{
+					Type:    global.SocketConnection,
+					Content: params.Content,
+					Time:    utils.DateTime(),
 				}
 			}
 
@@ -81,7 +76,7 @@ func WsPushUser(context *gin.Context) {
 	}
 
 	// 响应数据
-	context.JSON(http.StatusOK, map[string]interface{}{
+	response.Success(context, map[string]interface{}{
 		"online":     false,
 		"id":         mRead.Id,
 		"message_id": mRead.MessageId,

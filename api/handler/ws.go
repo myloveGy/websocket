@@ -4,11 +4,12 @@ import (
 	"net/http"
 	"websocket/api/response"
 	"websocket/global"
+	"websocket/service"
+	"websocket/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 
-	"websocket/api/handler/ws"
 	"websocket/models"
 )
 
@@ -52,8 +53,8 @@ func WebSocket(c *gin.Context) {
 		return
 	}
 
-	client := &ws.Client{
-		Hub:    ws.GlobalHub,
+	client := &service.Client{
+		Hub:    service.GlobalHub,
 		Conn:   conn,
 		Send:   make(chan interface{}, 256),
 		UserId: user_id,
@@ -61,6 +62,11 @@ func WebSocket(c *gin.Context) {
 	}
 
 	client.Hub.Register <- client
+	client.Send <- service.Message{
+		Type:    global.SocketConnection,
+		Content: "已经建立链接",
+		Time:    utils.DateTime(),
+	}
 
 	go client.WritePump()
 	go client.ReadPump()

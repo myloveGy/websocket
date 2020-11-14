@@ -1,8 +1,9 @@
-package ws
+package service
 
 import (
 	"sync"
 	"websocket/models"
+	"websocket/request"
 )
 
 type App struct {
@@ -54,4 +55,19 @@ func (a *App) unRegister(c *Client) {
 	}
 
 	a.mu.Unlock()
+}
+
+func (a *App) ToItem() *request.AppItem {
+	users := []string{}
+	for userId, _ := range a.Users {
+		users = append(users, userId)
+	}
+
+	return &request.AppItem{
+		AppId:       a.AppId,
+		AppName:     a.AppName,
+		OnlineUser:  len(a.Users),
+		OnlineGroup: len(a.Groups),
+		OnlineUsers: users,
+	}
 }

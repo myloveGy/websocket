@@ -21,6 +21,12 @@ type Database struct {
 	ShowSql      bool   `toml:"show_sql" json:"show_sql"`
 }
 
+type Redis struct {
+	Addr     string `toml:"addr" json:"addr"`
+	Password string `toml:"password" json:"password"`
+	DB       int    `toml:"db" json:"db"`
+}
+
 type Config struct {
 	AppName     string `toml:"app_name"`
 	StoragePath string `toml:"storage_path"`
@@ -34,6 +40,7 @@ type Config struct {
 	IsTesting   bool
 	PrivateKey  []byte
 	DB          map[string]*Database `toml:"database"` // 数据库信息
+	Redis       map[string]*Redis    `toml:"redis"`
 }
 
 var App = &Config{

@@ -4,17 +4,22 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"websocket/api/handler/ws"
 	"websocket/api/router"
 	"websocket/config"
+	"websocket/connection"
 	"websocket/global"
+	"websocket/service"
 )
 
 func main() {
 
+	// 连接mysql数据库
 	global.NewConnect("default")
 
-	go ws.GlobalHub.Run()
+	// 连接redis数据库
+	connection.NewRedisDb("default")
+
+	go service.GlobalHub.Run()
 
 	// 开启调试模式
 	if config.App.Debug == "on" {

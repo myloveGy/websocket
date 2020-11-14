@@ -1,4 +1,4 @@
-package ws
+package service
 
 import (
 	"sync"
@@ -55,7 +55,6 @@ func (h *Hub) CreateApp(app *models.App) {
 func (h *Hub) Run() {
 	for {
 		select {
-
 		case client := <-h.Register:
 			// 注册链接
 			h.CreateApp(client.App)
