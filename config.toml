@@ -16,6 +16,6 @@ show_sql = false
 
 [redis]
 [redis.default]
-server = ""
+addr = ""
 password = ""
 db = 0
