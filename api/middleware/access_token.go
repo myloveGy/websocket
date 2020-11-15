@@ -4,15 +4,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"websocket/api/response"
 	"websocket/cache"
-	"websocket/models"
+	"websocket/repo"
 )
 
 type MiddleWare struct {
 	userCache *cache.UserCache
+	appRepo   *repo.App
 }
 
-func NewMiddleWare(userCache *cache.UserCache) *MiddleWare {
-	return &MiddleWare{userCache: userCache}
+func NewMiddleWare(userCache *cache.UserCache, appRepo *repo.App) *MiddleWare {
+	return &MiddleWare{userCache: userCache, appRepo: appRepo}
 }
 
 func (m *MiddleWare) AccessToken() gin.HandlerFunc {
@@ -37,8 +38,8 @@ func (m *MiddleWare) AccessToken() gin.HandlerFunc {
 		}
 
 		// 查询应用信息
-		app := &models.App{Id: user.AppId}
-		if err := app.FindById(); err != nil {
+		app, err := m.appRepo.FindById(user.AppId)
+		if err != nil {
 			response.BusinessError(context, "应用信息不存在")
 			return
 		}

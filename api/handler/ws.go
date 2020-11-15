@@ -3,14 +3,13 @@ package handler
 import (
 	"net/http"
 	"websocket/api/response"
-	"websocket/global"
+	"websocket/entity"
+	"websocket/repo"
 	"websocket/service"
 	"websocket/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-
-	"websocket/models"
 )
 
 var upgrade = websocket.Upgrader{
@@ -19,8 +18,16 @@ var upgrade = websocket.Upgrader{
 	},
 }
 
+type WS struct {
+	appRepo *repo.App
+}
+
+func NewWs(app *repo.App) *WS {
+	return &WS{appRepo: app}
+}
+
 // WebSocket 处理websocket 信息
-func WebSocket(c *gin.Context) {
+func (w *WS) WebSocket(c *gin.Context) {
 	// 验证参数
 	appId := c.Param("app_id")
 	if appId == "" {
@@ -29,14 +36,14 @@ func WebSocket(c *gin.Context) {
 	}
 
 	// 查询应用信息
-	app := &models.App{AppId: c.Param("app_id")}
-	if err := app.Find(); err != nil {
+	app, err := w.appRepo.FindByAppId(c.Param("app_id"))
+	if err != nil {
 		response.InvalidParams(c, "应用信息不存在: "+err.Error())
 		return
 	}
 
 	// 验证应用状态
-	if app.Status != global.AppStatusActivate {
+	if app.Status != entity.AppStatusActivate {
 		response.BusinessError(c, "应用信息已经被停用")
 		return
 	}
@@ -47,7 +54,7 @@ func WebSocket(c *gin.Context) {
 		return
 	}
 
-	var conn, err = upgrade.Upgrade(c.Writer, c.Request, nil)
+	conn, err := upgrade.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		response.SystemError(c, "upgrade error")
 		return
@@ -63,7 +70,7 @@ func WebSocket(c *gin.Context) {
 
 	client.Hub.Register <- client
 	client.Send <- service.Message{
-		Type:    global.SocketConnection,
+		Type:    entity.SocketConnection,
 		Content: "已经建立链接",
 		Time:    utils.DateTime(),
 	}

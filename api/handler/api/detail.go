@@ -5,6 +5,7 @@ import (
 	"websocket/api/response"
 	"websocket/cache"
 	"websocket/config"
+	"websocket/repo"
 	"websocket/request"
 	"websocket/service"
 	"websocket/utils"
@@ -12,10 +13,11 @@ import (
 
 type Api struct {
 	userCache *cache.UserCache
+	userRepo  *repo.User
 }
 
-func NewApi(userCache *cache.UserCache) *Api {
-	return &Api{userCache: userCache}
+func NewApi(userCache *cache.UserCache, userRepo *repo.User) *Api {
+	return &Api{userCache: userCache, userRepo: userRepo}
 }
 
 func (*Api) Detail(c *gin.Context) {

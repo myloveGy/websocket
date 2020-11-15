@@ -5,8 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"time"
 	"websocket/api/response"
-	"websocket/global"
-	"websocket/models"
 	"websocket/request"
 	"websocket/utils"
 )
@@ -19,8 +17,8 @@ func (a *Api) Login(c *gin.Context) {
 	}
 
 	// 需要查询用户是否存在
-	user := &models.User{}
-	if err := user.FindByUsername(global.DB, params.Username); err != nil {
+	user, err := a.userRepo.FindByUsername(params.Username)
+	if err != nil {
 		response.BusinessError(c, "登录账户或者密码错误")
 		return
 	}
@@ -42,7 +40,7 @@ func (a *Api) Login(c *gin.Context) {
 	}
 
 	// 修改表
-	if _, err := user.UpdateAccessToken(global.DB); err != nil {
+	if _, err := a.userRepo.UpdateAccessToken(user.UserId, user.AccessToken); err != nil {
 		response.SystemError(c, "登录失败(db error)")
 		return
 	}

@@ -3,14 +3,22 @@ package push
 import (
 	"github.com/gin-gonic/gin"
 	"websocket/api/response"
-	"websocket/global"
+	"websocket/entity"
 	"websocket/models"
+	"websocket/repo"
 	"websocket/request"
 	"websocket/service"
 	"websocket/utils"
 )
 
-type Push struct{}
+type Push struct {
+	messageRepo     *repo.Message
+	messageReadRepo *repo.MessageRead
+}
+
+func NewPush(messageRepo *repo.Message, messageReadRepo *repo.MessageRead) *Push {
+	return &Push{messageRepo: messageRepo, messageReadRepo: messageReadRepo}
+}
 
 func (p *Push) User(context *gin.Context) {
 	// 验证绑定数据
@@ -32,7 +40,7 @@ func (p *Push) User(context *gin.Context) {
 		if user, ok1 := value.Users[params.UserId]; ok1 {
 			for _, client := range user {
 				client.Send <- service.Message{
-					Type:    global.SocketConnection,
+					Type:    entity.SocketConnection,
 					Content: params.Content,
 					Time:    utils.DateTime(),
 				}
@@ -59,7 +67,7 @@ func (p *Push) User(context *gin.Context) {
 	}
 
 	// 添加消息
-	if err := m.Create(global.DB); err != nil {
+	if err := p.messageRepo.Create(m); err != nil {
 		response.SystemError(context, "添加消息失败")
 		return
 	}
@@ -71,7 +79,7 @@ func (p *Push) User(context *gin.Context) {
 		UserId:    params.UserId,
 	}
 
-	if err := mRead.Create(global.DB); err != nil {
+	if err := p.messageReadRepo.Create(mRead); err != nil {
 		response.SystemError(context, "添加用户消息失败")
 		return
 	}

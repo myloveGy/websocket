@@ -6,8 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"websocket/api/response"
-	"websocket/global"
-	"websocket/models"
+	"websocket/entity"
 	"websocket/utils"
 )
 
@@ -17,7 +16,7 @@ type SignParam struct {
 	Sign  string `form:"sign" json:"sign" binding:"required"`
 }
 
-func (*MiddleWare) Sign() gin.HandlerFunc {
+func (m *MiddleWare) Sign() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		body, _ := ioutil.ReadAll(context.Request.Body)
 		data := map[string]interface{}{}
@@ -42,18 +41,20 @@ func (*MiddleWare) Sign() gin.HandlerFunc {
 		}
 
 		// 获取到应用信息
-		app := &models.App{AppId: appId}
-		err := app.Find()
+		app, err := m.appRepo.FindByAppId(appId)
+		if err != nil {
+			response.Unauthorized(context, "应用信息错误")
+		}
 
 		// 验证签名信息
 		if utils.Sign(data, app.AppSecret) != data["sign"].(string) {
-			response.InvalidParams(context, "签名信息错误")
+			response.Unauthorized(context, "签名信息错误")
 			return
 		}
 
 		// 验证应用状态
-		if err != nil || app.Status != global.AppStatusActivate {
-			response.BusinessError(context, "应用信息错误")
+		if err != nil || app.Status != entity.AppStatusActivate {
+			response.Unauthorized(context, "应用信息错误")
 			return
 		}
 
