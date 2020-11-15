@@ -3,21 +3,25 @@ package cache
 import (
 	"fmt"
 	"time"
+	"websocket/connection"
 	"websocket/models"
-	"websocket/service"
 )
 
 type UserCache struct {
-	rds *service.RedisClient
+	rds *connection.Redis
 }
 
-func NewUserCache(rds *service.RedisClient) *UserCache {
+func (u *UserCache) key(s string) string {
+	return fmt.Sprintf("user:%s", s)
+}
+
+func NewUserCache(rds *connection.Redis) *UserCache {
 	return &UserCache{rds: rds}
 }
 
 func (u *UserCache) Get(accessToken string) (*models.User, error) {
 	modelUser := &models.User{}
-	if err := u.rds.Get(fmt.Sprintf("user:%s", accessToken), modelUser); err != nil {
+	if err := u.rds.Get(u.key(accessToken), modelUser); err != nil {
 		return nil, err
 	}
 
@@ -25,5 +29,9 @@ func (u *UserCache) Get(accessToken string) (*models.User, error) {
 }
 
 func (u *UserCache) Set(accessToken string, m *models.User) error {
-	return u.rds.Set(fmt.Sprintf("user:%s", accessToken), m, time.Hour)
+	return u.rds.Set(u.key(accessToken), m, time.Hour)
+}
+
+func (u *UserCache) Delete(accessToken string) error {
+	return u.rds.Delete(u.key(accessToken))
 }

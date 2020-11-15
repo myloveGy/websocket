@@ -1,24 +1,24 @@
-package global
+package connection
 
 import (
 	"errors"
 	"fmt"
-	"log"
-	"time"
-
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-
+	"log"
+	"time"
 	"websocket/config"
 )
 
-var DB *sqlx.DB
+func NewDB(name ...string) *sqlx.DB {
+	defaultName := "default"
+	if name != nil && name[0] != "" {
+		defaultName = name[0]
+	}
 
-func NewConnect(defaultConfig string) {
-
-	configValue, ok := config.App.DB[defaultConfig]
+	configValue, ok := config.App.DB[defaultName]
 	if !ok {
-		log.Fatalln(errors.New(defaultConfig + ": 数据库配置为空"))
+		log.Fatalln(errors.New(defaultName + ": 数据库配置为空"))
 	}
 
 	fmt.Printf("Mysql: configValue.Driver = %s, configValue.Dsn = %s \n", configValue.Driver, configValue.Dsn)
@@ -34,5 +34,5 @@ func NewConnect(defaultConfig string) {
 		db.SetConnMaxLifetime(time.Duration(configValue.MaxLifetime) * time.Second)
 	}
 
-	DB = db
+	return db
 }

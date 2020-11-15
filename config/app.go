@@ -25,6 +25,7 @@ type Redis struct {
 	Addr     string `toml:"addr" json:"addr"`
 	Password string `toml:"password" json:"password"`
 	DB       int    `toml:"db" json:"db"`
+	Prefix   string `toml:"prefix" json:"prefix"`
 }
 
 type Config struct {

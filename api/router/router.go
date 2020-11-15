@@ -1,14 +1,13 @@
 package router
 
 import (
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"websocket/api/handler/api"
 	"websocket/api/handler/push"
+	"websocket/api/handler/user"
 	"websocket/cache"
 	"websocket/connection"
-	"websocket/service"
-
-	"github.com/gin-gonic/gin"
 
 	"websocket/api/handler"
 	"websocket/api/middleware"
@@ -18,9 +17,10 @@ import (
 func NewRouter() *gin.Engine {
 	r := gin.Default()
 
-	serviceRedis := service.NewRedisClient(connection.RedisDB)
-	userCache := cache.NewUserCache(serviceRedis)
-	r.Use(middleware.Translations())
+	redisConnection := connection.NewRedis()
+	userCache := cache.NewUserCache(redisConnection)
+	middle := middleware.NewMiddleWare(userCache)
+	r.Use(middle.Translations())
 	// api
 	apiRouter := r.Group("/api")
 	{
@@ -29,11 +29,16 @@ func NewRouter() *gin.Engine {
 		apiRouter.POST("/login", apiHandler.Login)  // 用户登录
 	}
 
+	// 用户相关
+	userRouter := r.Use(middle.AccessToken())
+	userHandler := user.NewUser()
+	userRouter.POST("/user/ws", userHandler.Ws)
+
 	// websocket 处理
 	r.GET("/ws/:app_id", handler.WebSocket)
 
 	pushRouter := r.Group("/ws/push")
-	pushRouter.Use(middleware.Sign())
+	pushRouter.Use(middle.Sign())
 	{
 		pushHandler := &push.Push{}
 		pushRouter.POST("/user", pushHandler.User)  // 发送到指定用户

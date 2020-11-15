@@ -2,7 +2,6 @@ package push
 
 import (
 	"github.com/gin-gonic/gin"
-	"net/http"
 	"websocket/api/response"
 	"websocket/global"
 	"websocket/models"
@@ -17,7 +16,7 @@ func (p *Push) User(context *gin.Context) {
 	// 验证绑定数据
 	params := &request.UserParams{}
 	if isError, err := utils.BindAndValid(context, params); isError {
-		response.NewResponseError(context, "PushUserError", "请求参数错误:"+err.Error())
+		response.InvalidParams(context, err.Error())
 		return
 	}
 
@@ -25,7 +24,7 @@ func (p *Push) User(context *gin.Context) {
 	app, ok := context.Get("app")
 	appModel, ok1 := app.(*models.App)
 	if !ok || !ok1 {
-		response.NewResponseError(context, "PushUserError", "APP信息错误")
+		response.BusinessError(context, "APP信息错误")
 		return
 	}
 
@@ -40,13 +39,15 @@ func (p *Push) User(context *gin.Context) {
 			}
 
 			// 响应数据
-			context.JSON(http.StatusOK, map[string]interface{}{
+			response.Success(context, map[string]interface{}{
 				"online":     true,
 				"user_id":    params.UserId,
 				"content":    params.Content,
 				"type":       params.Type,
 				"created_at": utils.DateTime(),
 			})
+
+			return
 		}
 	}
 
@@ -59,7 +60,7 @@ func (p *Push) User(context *gin.Context) {
 
 	// 添加消息
 	if err := m.Create(global.DB); err != nil {
-		response.NewResponseError(context, "PushUserError", "添加消息失败")
+		response.SystemError(context, "添加消息失败")
 		return
 	}
 
@@ -71,7 +72,7 @@ func (p *Push) User(context *gin.Context) {
 	}
 
 	if err := mRead.Create(global.DB); err != nil {
-		response.NewResponseError(context, "PushUserError", "添加用户消息失败")
+		response.SystemError(context, "添加用户消息失败")
 		return
 	}
 

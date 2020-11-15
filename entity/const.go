@@ -1,4 +1,4 @@
-package global
+package entity
 
 const (
 	// Socket消息类型
@@ -10,5 +10,5 @@ const (
 
 	// 应用状态
 	AppStatusActivate = 1 // 状态启用
-	AppStatusDisabled = 4 // 停用
+	AppStatusDisabled = 2 // 停用
 )

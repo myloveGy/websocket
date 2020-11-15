@@ -7,7 +7,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"websocket/global"
+	"websocket/entity"
 	"websocket/utils"
 )
 
@@ -76,24 +76,24 @@ func (c *Client) ReadPump() {
 
 		switch msg.Type {
 		// 心跳检测
-		case global.SocketHeartbeat:
+		case entity.SocketHeartbeat:
 			responseMessage = Message{
-				Type: global.SocketHeartbeat,
+				Type: entity.SocketHeartbeat,
 				Time: utils.DateTime(),
 			}
 
 			// 关闭链接
-		case global.SocketClose: // 关闭链接
+		case entity.SocketClose: // 关闭链接
 			log.Printf("close: %v", msg)
 			_ = c.Conn.Close()
 			break
-		case global.SocketMessage:
+		case entity.SocketMessage:
 			result, err := utils.GetHTTP(msg.Content)
 			if err != nil || result.Code != 0 {
 				log.Printf("机器人回复失败：%v\n", err)
 
 				responseMessage = Message{
-					Type:    global.SocketMessage,
+					Type:    entity.SocketMessage,
 					Content: "机器人回复失败",
 					Time:    utils.DateTime(),
 				}
@@ -102,7 +102,7 @@ func (c *Client) ReadPump() {
 			}
 
 			responseMessage = Message{
-				Type:    global.SocketMessage,
+				Type:    entity.SocketMessage,
 				Content: result.Content,
 				Time:    utils.DateTime(),
 			}

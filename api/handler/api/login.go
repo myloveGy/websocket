@@ -14,34 +14,36 @@ import (
 func (a *Api) Login(c *gin.Context) {
 	params := &request.UserLogin{}
 	if isError, err := utils.BindAndValid(c, params); isError {
-		response.NewResponseError(c, "userLogin", "参数错误:"+err.Error())
+		response.InvalidParams(c, err)
 		return
 	}
 
 	// 需要查询用户是否存在
 	user := &models.User{}
 	if err := user.FindByUsername(global.DB, params.Username); err != nil {
-		response.NewResponseError(c, "userLogin", "登录账户或者密码错误")
+		response.BusinessError(c, "登录账户或者密码错误")
 		return
 	}
 
 	// 验证密码是否正确
 	if user.Password != params.Password {
-		response.NewResponseError(c, "userLogin", "登录账户或者密码错误")
+		response.BusinessError(c, "登录账户或者密码错误")
 		return
 	}
 
+	// 删除之前的redis(目的，值允许一台设备登录)
+	a.userCache.Delete(user.AccessToken)
+
 	// 生成redis
-	accessToken := fmt.Sprintf("%d", time.Now().Unix())
-	if err := a.userCache.Set(accessToken, user); err != nil {
-		response.NewResponseError(c, "userLogin", "登录失败(redis error)")
+	user.AccessToken = utils.Md5(fmt.Sprintf("%d:%d", user.UserId, time.Now().Unix()))
+	if err := a.userCache.Set(user.AccessToken, user); err != nil {
+		response.SystemError(c, "登录失败(redis error)")
 		return
 	}
 
 	// 修改表
-	user.AccessToken = accessToken
 	if _, err := user.UpdateAccessToken(global.DB); err != nil {
-		response.NewResponseError(c, "userLogin", "登录失败(db error)")
+		response.SystemError(c, "登录失败(db error)")
 		return
 	}
 

@@ -2,22 +2,14 @@ package models
 
 import (
 	"time"
-
-	"websocket/global"
 )
 
 type App struct {
-	Id        int64     `db:"id"`
-	AppId     string    `db:"app_id"`
-	AppSecret string    `db:"app_secret"`
-	AppName   string    `db:"app_name"`
-	VerifyUrl string    `db:"verify_url"`
-	Status    int       `db:"status"`
-	CreatedAt time.Time `db:"created_at"`
-	UpdatedAt time.Time `db:"updated_at"`
-}
-
-// 查询
-func (a *App) Find() error {
-	return global.DB.Get(a, "SELECT * FROM `app` WHERE `app_id` = ?", a.AppId)
+	Id        int64     `db:"id" json:"id"`
+	AppId     string    `db:"app_id" json:"app_id"`
+	AppSecret string    `db:"app_secret" json:"app_secret"`
+	AppName   string    `db:"app_name" json:"app_name"`
+	Status    int       `db:"status" json:"status"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }

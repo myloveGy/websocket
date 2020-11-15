@@ -2,6 +2,7 @@ package utils
 
 import (
 	"strings"
+	"websocket/models"
 
 	"github.com/gin-gonic/gin"
 	ut "github.com/go-playground/universal-translator"
@@ -54,4 +55,32 @@ func BindAndValid(c *gin.Context, v interface{}) (bool, ValidErrors) {
 	}
 
 	return false, nil
+}
+
+func GetUser(c *gin.Context) *models.User {
+	value, ok := c.Get("user")
+	if !ok {
+		return nil
+	}
+
+	user, ok1 := value.(*models.User)
+	if !ok1 {
+		return nil
+	}
+
+	return user
+}
+
+func GetApp(c *gin.Context) *models.App {
+	value, ok := c.Get("app")
+	if !ok {
+		return nil
+	}
+
+	app, ok1 := value.(*models.App)
+	if !ok1 {
+		return nil
+	}
+
+	return app
 }

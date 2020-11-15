@@ -13,7 +13,7 @@ import (
 	zhTwTranslations "github.com/go-playground/validator/v10/translations/zh_tw"
 )
 
-func Translations() gin.HandlerFunc {
+func (*MiddleWare) Translations() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		uni := ut.New(en.New(), zh.New(), zh_Hant_TW.New())
 		locale := c.GetHeader("locale")

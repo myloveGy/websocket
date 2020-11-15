@@ -6,18 +6,10 @@ import (
 	"net/http"
 	"websocket/api/router"
 	"websocket/config"
-	"websocket/connection"
-	"websocket/global"
 	"websocket/service"
 )
 
 func main() {
-
-	// 连接mysql数据库
-	global.NewConnect("default")
-
-	// 连接redis数据库
-	connection.NewRedisDb("default")
 
 	go service.GlobalHub.Run()
 
