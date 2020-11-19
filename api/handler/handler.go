@@ -12,12 +12,3 @@ type Handler struct {
 	User *user.User
 	Ws   *WS
 }
-
-func NewHandler(api *api.Api, push *push.Push, user *user.User, ws *WS) *Handler {
-	return &Handler{
-		Api:  api,
-		Push: push,
-		User: user,
-		Ws:   ws,
-	}
-}

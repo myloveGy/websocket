@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"websocket/api/response"
 	"websocket/cache"
 	"websocket/config"
@@ -17,7 +18,10 @@ type Api struct {
 }
 
 func NewApi(userCache *cache.UserCache, userRepo *repo.User) *Api {
-	return &Api{userCache: userCache, userRepo: userRepo}
+	return &Api{
+		userCache: userCache,
+		userRepo:  userRepo,
+	}
 }
 
 func (*Api) Detail(c *gin.Context) {

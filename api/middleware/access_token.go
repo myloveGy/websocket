@@ -2,19 +2,9 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"websocket/api/response"
-	"websocket/cache"
-	"websocket/repo"
 )
-
-type MiddleWare struct {
-	userCache *cache.UserCache
-	appRepo   *repo.App
-}
-
-func NewMiddleWare(userCache *cache.UserCache, appRepo *repo.App) *MiddleWare {
-	return &MiddleWare{userCache: userCache, appRepo: appRepo}
-}
 
 func (m *MiddleWare) AccessToken() gin.HandlerFunc {
 	return func(context *gin.Context) {

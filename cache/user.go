@@ -11,12 +11,12 @@ type UserCache struct {
 	rds *connection.Redis
 }
 
-func (u *UserCache) key(s string) string {
-	return fmt.Sprintf("user:%s", s)
-}
-
 func NewUserCache(rds *connection.Redis) *UserCache {
 	return &UserCache{rds: rds}
+}
+
+func (u *UserCache) key(s string) string {
+	return fmt.Sprintf("user:%s", s)
 }
 
 func (u *UserCache) Get(accessToken string) (*models.User, error) {

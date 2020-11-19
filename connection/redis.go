@@ -3,8 +3,10 @@ package connection
 import (
 	"context"
 	"encoding/json"
-	"github.com/go-redis/redis/v8"
 	"time"
+
+	"github.com/go-redis/redis/v8"
+
 	"websocket/config"
 )
 
@@ -15,12 +17,8 @@ type Redis struct {
 	Client *redis.Client
 }
 
-func NewRedis(name ...string) *Redis {
+func NewRedis() *Redis {
 	defaultName := "default"
-	if name != nil && name[0] != "" {
-		defaultName = name[0]
-	}
-
 	configRedis, ok := config.App.Redis[defaultName]
 	if !ok {
 		panic("init redis error: config is empty")

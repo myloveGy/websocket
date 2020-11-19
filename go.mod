@@ -10,6 +10,7 @@ require (
 	github.com/go-redis/redis/v8 v8.3.3
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/protobuf v1.4.3 // indirect
+	github.com/google/wire v0.4.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/json-iterator/go v1.1.10 // indirect

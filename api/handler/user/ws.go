@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"strconv"
 	"websocket/api/response"
+	"websocket/helpers"
 	"websocket/utils"
 )
 
@@ -15,13 +16,13 @@ func NewUser() *User {
 }
 
 func (u *User) Ws(c *gin.Context) {
-	user := utils.GetUser(c)
+	user := helpers.GetUser(c)
 	if user == nil {
 		response.NotLogin(c)
 		return
 	}
 
-	app := utils.GetApp(c)
+	app := helpers.GetApp(c)
 	if app == nil {
 		response.NotLogin(c)
 		return
