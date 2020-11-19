@@ -68,7 +68,7 @@ func TestMessageRead_FindAll(t *testing.T) {
 			name:    "测试用例",
 			args:    &args{AppId: 1, UserId: "1", Status: 1},
 			fields:  messageReadRepo,
-			want:    []*models.MessageRead{&models.MessageRead{}},
+			want:    []*models.MessageRead{{}},
 			wantErr: false,
 		},
 	}

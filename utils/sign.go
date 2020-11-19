@@ -11,7 +11,7 @@ import (
 
 func GetMapStringSort(data map[string]interface{}) []string {
 	result := []string{}
-	for k, _ := range data {
+	for k := range data {
 		result = append(result, k)
 	}
 

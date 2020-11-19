@@ -4,22 +4,24 @@ GOFILES := $(shell find . -name "*.go" -type f -not -path "./vendor/*")
 VETPACKAGES ?= $(shell $(GO) list ./... | grep -v /vendor/ | grep -v /examples/)
 
 .PHONY: build
-build: fmt-check
+build: fmt-check generate
 	$(GO) build -o app
 
-.PHONY: check
-check: fmt build
-	gotest -short  -v -coverprofile=cover.out ./...
-	make cover
+.PHONY: generate
+generate:
+	@if [ ! -x "$(command -v wire)" ]; then \
+	$(GO) get github.com/google/wire/cmd/wire; \
+	fi;
+	$(GO) generate
+
 .PHONY: test
 test:
-	$(GO) test -short  -v -coverprofile=cover.out ./...
+	$(GO) test -short -v -coverprofile=cover.out ./...
 
 .PHONY: cover
-cover: test
+cover:
 	$(GO) tool cover -func=cover.out -o cover_total.out
 	$(GO) tool cover -html=cover.out -o cover.html
-
 .PHONY: fmt
 fmt:
 	$(GOFMT) -w $(GOFILES)
@@ -36,8 +38,3 @@ fmt-check:
 
 vet:
 	$(GO) vet $(VETPACKAGES)
-
-
-
-
-

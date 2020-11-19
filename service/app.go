@@ -59,7 +59,7 @@ func (a *App) unRegister(c *Client) {
 
 func (a *App) ToItem() *request.AppItem {
 	users := []string{}
-	for userId, _ := range a.Users {
+	for userId := range a.Users {
 		users = append(users, userId)
 	}
 
