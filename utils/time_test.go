@@ -29,3 +29,8 @@ func TestTime_UnmarshalJSON(t *testing.T) {
 	err := v.UnmarshalJSON([]byte(s))
 	assert.NoError(t, err)
 }
+
+func TestTime_String(t *testing.T) {
+	v := Time(time.Now())
+	assert.Equal(t, time.Now().Format(DateTimeLayout), v.String())
+}

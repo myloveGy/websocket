@@ -21,7 +21,7 @@ func (m *MessageRead) FindAll(appId int64, userId string, status int) ([]*models
 		"FROM `message_read` "+
 		"INNER JOIN `message` ON (`message_read`.`message_id` = `message`.`message_id`) "+
 		"WHERE  `message_read`.`app_id` = ? AND `message_read`.`user_id` = ? AND `message_read`.`status` = ? "+
-		"ORDER BY `created_at` ASC", appId, userId, status)
+		"ORDER BY `message_read`.`created_at` ASC", appId, userId, status)
 	return list, err
 }
 
