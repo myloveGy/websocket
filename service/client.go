@@ -40,8 +40,7 @@ type Client struct {
 	Conn *websocket.Conn
 
 	// 发送消息
-	Send chan interface {
-	}
+	Send chan interface{}
 }
 
 // Message 发放的消息信息
