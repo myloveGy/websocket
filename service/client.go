@@ -1,8 +1,10 @@
 package service
 
 import (
+	"encoding/json"
 	"log"
 	"time"
+
 	"websocket/models"
 
 	"github.com/gorilla/websocket"
@@ -83,12 +85,28 @@ func (c *Client) ReadPump() {
 			}
 
 			// 关闭链接
-		case entity.SocketClose: // 关闭链接
+		case entity.SocketClose:
 			log.Printf("close: %v", msg)
 			_ = c.Conn.Close()
 			break
 		case entity.SocketMessage:
-			result, err := utils.GetHTTP(msg.Content)
+			m := &struct {
+				Source  string `json:"source"`
+				Content string `json:"content"`
+			}{}
+
+			err := json.Unmarshal([]byte(msg.Content), m)
+			if err != nil {
+				responseMessage = Message{
+					Type:    entity.SocketMessage,
+					Content: "你发的什么: " + err.Error(),
+					Time:    utils.DateTime(),
+				}
+
+				break
+			}
+
+			result, err := utils.GetHTTP(m.Content)
 			if err != nil || result.Code != 0 {
 				log.Printf("机器人回复失败：%v\n", err)
 
@@ -108,7 +126,9 @@ func (c *Client) ReadPump() {
 			}
 		}
 
-		c.Send <- responseMessage
+		if responseMessage.Type != "" {
+			c.Send <- responseMessage
+		}
 	}
 }
 

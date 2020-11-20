@@ -23,7 +23,7 @@ func (m *MiddleWare) AccessToken() gin.HandlerFunc {
 		// redis 获取用户信息
 		user, err := m.userCache.Get(accessToken)
 		if err != nil {
-			response.NotLogin(context, err)
+			response.NotLogin(context)
 			return
 		}
 
