@@ -1,22 +1,22 @@
 package repo
 
 import (
-	"github.com/jmoiron/sqlx"
+	"github.com/jinxing-go/mysql"
 	"websocket/models"
 )
 
 type App struct {
-	db *sqlx.DB
+	*mysql.MySQl
 }
 
-func NewApp(db *sqlx.DB) *App {
-	return &App{db: db}
+func NewApp(mysql *mysql.MySQl) *App {
+	return &App{mysql}
 }
 
 // 查询
 func (a *App) FindByAppId(appId string) (*models.App, error) {
-	app := &models.App{}
-	if err := a.db.Get(app, "SELECT * FROM `app` WHERE `app_id` = ?", appId); err != nil {
+	app := &models.App{AppId: appId}
+	if err := a.Find(app); err != nil {
 		return nil, err
 	}
 
@@ -24,8 +24,8 @@ func (a *App) FindByAppId(appId string) (*models.App, error) {
 }
 
 func (a *App) FindById(id int64) (*models.App, error) {
-	app := &models.App{}
-	if err := a.db.Get(app, "SELECT * FROM `app` WHERE `id` = ?", id); err != nil {
+	app := &models.App{Id: id}
+	if err := a.Find(app); err != nil {
 		return nil, err
 	}
 

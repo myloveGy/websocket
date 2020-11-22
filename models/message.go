@@ -11,3 +11,11 @@ type Message struct {
 	Content   string    `db:"content" json:"content"`
 	CreatedAt time.Time `db:"created_at"`
 }
+
+func (*Message) TableName() string {
+	return "message"
+}
+
+func (*Message) PK() string {
+	return "message_id"
+}

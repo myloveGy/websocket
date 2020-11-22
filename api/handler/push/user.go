@@ -2,6 +2,7 @@ package push
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/jinxing-go/mysql"
 	"websocket/api/response"
 	"websocket/entity"
 	"websocket/models"
@@ -42,7 +43,7 @@ func (p *Push) User(context *gin.Context) {
 				client.Send <- service.Message{
 					Type:    entity.SocketConnection,
 					Content: params.Content,
-					Time:    utils.DateTime(),
+					Time:    mysql.DateTime(),
 				}
 			}
 
@@ -52,7 +53,7 @@ func (p *Push) User(context *gin.Context) {
 				"user_id":    params.UserId,
 				"content":    params.Content,
 				"type":       params.Type,
-				"created_at": utils.DateTime(),
+				"created_at": mysql.DateTime(),
 			})
 
 			return
@@ -92,6 +93,6 @@ func (p *Push) User(context *gin.Context) {
 		"user_id":    params.UserId,
 		"content":    params.Content,
 		"type":       params.Type,
-		"created_at": utils.DateTime(),
+		"created_at": mysql.DateTime(),
 	})
 }

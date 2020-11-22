@@ -1,23 +1,30 @@
 package repo
 
 import (
-	"github.com/jmoiron/sqlx"
-
+	"github.com/jinxing-go/mysql"
 	"websocket/models"
-	"websocket/utils"
 )
 
 type User struct {
-	db *sqlx.DB
+	*mysql.MySQl
 }
 
-func NewUser(db *sqlx.DB) *User {
-	return &User{db: db}
+func NewUser(mysql *mysql.MySQl) *User {
+	return &User{MySQl: mysql}
 }
 
 func (u *User) FindByUsername(username string) (*models.User, error) {
-	user := &models.User{}
-	if err := u.db.Get(user, "select * from `user` where `username` = ?", username); err != nil {
+	user := &models.User{Username: username}
+	if err := u.Find(user, "username"); err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (u *User) FindByPhone(phone string) (*models.User, error) {
+	user := &models.User{Phone: phone}
+	if err := u.Find(user, "phone"); err != nil {
 		return nil, err
 	}
 
@@ -25,15 +32,8 @@ func (u *User) FindByUsername(username string) (*models.User, error) {
 }
 
 func (u *User) UpdateAccessToken(userId int64, accessToken string) (int64, error) {
-	result, err := u.db.Exec(
-		"update `user` SET `access_token` = ?, updated_at = ?  WHERE `user_id` = ?",
-		accessToken,
-		utils.DateTime(),
-		userId,
-	)
-	if err != nil {
-		return 0, err
-	}
-
-	return result.RowsAffected()
+	return u.Update(&models.User{
+		UserId:      userId,
+		AccessToken: accessToken,
+	})
 }

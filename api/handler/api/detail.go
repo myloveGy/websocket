@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/jinxing-go/mysql"
 
 	"websocket/api/response"
 	"websocket/cache"
@@ -9,7 +10,6 @@ import (
 	"websocket/repo"
 	"websocket/request"
 	"websocket/service"
-	"websocket/utils"
 )
 
 type Api struct {
@@ -35,7 +35,7 @@ func (*Api) Detail(c *gin.Context) {
 		"online_app":    len(service.GlobalHub.Apps),
 		"online_client": service.GlobalHub.OnlineClient,
 		"apps":          info,
-		"time":          utils.DateTime(),
+		"time":          mysql.DateTime(),
 	}
 
 	response.Success(c, data)

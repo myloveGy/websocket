@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 
 	"websocket/config"
@@ -19,13 +17,7 @@ func main() {
 		gin.SetMode("debug")
 	}
 
-	router := Initialize()
+	s := Initialize()
 	fmt.Println("Http Listen" + config.App.Address)
-	s := &http.Server{
-		Addr:           config.App.Address,
-		Handler:        router.Run(),
-		MaxHeaderBytes: 1 << 20,
-	}
-
 	s.ListenAndServe()
 }

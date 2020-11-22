@@ -11,7 +11,7 @@ import (
 )
 
 func newTestMessageRepo() *Message {
-	db := connection.NewDB()
+	db := connection.NewMySQL()
 	return NewMessage(db)
 }
 
@@ -27,12 +27,6 @@ func TestMessage_Create(t *testing.T) {
 	err := messageRepo.Create(messageModel)
 	assert.NoError(t, err)
 
-	_, err1 := messageRepo.Delete(messageModel.MessageId)
+	_, err1 := messageRepo.Delete(&models.Message{MessageId: messageModel.MessageId})
 	assert.NoError(t, err1)
-}
-
-func TestMessage_Delete(t *testing.T) {
-	messageRepo := newTestMessageRepo()
-	_, err := messageRepo.Delete(10000)
-	assert.NoError(t, err)
 }

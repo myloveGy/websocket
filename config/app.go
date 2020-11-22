@@ -1,25 +1,15 @@
 package config
 
 import (
+	"github.com/jinxing-go/mysql"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
-
 	config2 "websocket/pkg/config"
 )
-
-type Database struct {
-	Enable       bool   `toml:"enable" json:"enable"`
-	Driver       string `toml:"driver" json:"driver"`
-	Dsn          string `toml:"dsn" json:"dsn"`
-	MaxOpenConns int    `toml:"max_open_conns" json:"max_open_conns"`
-	MaxIdleConns int    `toml:"max_idle_conns" json:"max_idle_conns"`
-	MaxLifetime  int    `toml:"max_lefttime" json:"max_lefttime"`
-	ShowSql      bool   `toml:"show_sql" json:"show_sql"`
-}
 
 type Redis struct {
 	Addr     string `toml:"addr" json:"addr"`
@@ -40,8 +30,8 @@ type Config struct {
 	StartTime   time.Time
 	IsTesting   bool
 	PrivateKey  []byte
-	DB          map[string]*Database `toml:"database"` // 数据库信息
-	Redis       map[string]*Redis    `toml:"redis"`
+	DB          map[string]*mysql.MySQLConfig `toml:"database"` // 数据库信息
+	Redis       map[string]*Redis             `toml:"redis"`
 }
 
 var App = &Config{

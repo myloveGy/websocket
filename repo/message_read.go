@@ -1,22 +1,21 @@
 package repo
 
 import (
-	"github.com/jmoiron/sqlx"
-	"time"
+	"github.com/jinxing-go/mysql"
 	"websocket/models"
 )
 
 type MessageRead struct {
-	db *sqlx.DB
+	*mysql.MySQl
 }
 
-func NewMessageRead(db *sqlx.DB) *MessageRead {
-	return &MessageRead{db: db}
+func NewMessageRead(mysql *mysql.MySQl) *MessageRead {
+	return &MessageRead{mysql}
 }
 
 func (m *MessageRead) FindAll(appId int64, userId string, status int) ([]*models.MessageRead, error) {
 	list := make([]*models.MessageRead, 0)
-	err := m.db.Select(&list, "SELECT "+
+	err := m.DB.Select(&list, "SELECT "+
 		"`message_read`.*, `message`.`content`, `message`.`type` "+
 		"FROM `message_read` "+
 		"INNER JOIN `message` ON (`message_read`.`message_id` = `message`.`message_id`) "+
@@ -25,43 +24,10 @@ func (m *MessageRead) FindAll(appId int64, userId string, status int) ([]*models
 	return list, err
 }
 
-// Create 创建
-func (m *MessageRead) Create(model *models.MessageRead) error {
-	model.CreatedAt = time.Now()
-	model.UpdatedAt = model.CreatedAt
-	result, err := m.db.Exec(
-		"INSERT INTO `message_read` (`message_id`, `app_id`, `user_id`, `group_id`, `created_at`, `updated_at`) VALUES (?, ?, ?, ?, ?, ?)",
-		model.MessageId,
-		model.AppId,
-		model.UserId,
-		model.GroupId,
-		model.CreatedAt,
-		model.UpdatedAt,
-	)
-	if err != nil {
-		return err
-	}
-
-	model.Id, err = result.LastInsertId()
-	return err
-}
-
-// Delete 删除数据
-func (m *MessageRead) Delete(id int64) (int64, error) {
-	result, err := m.db.Exec("DELETE FROM `message_read` WHERE `id` = ?", id)
-	if err != nil {
-		return 0, err
-	}
-
-	return result.RowsAffected()
-}
-
 // UpdateStatus 修改状态
 func (m *MessageRead) UpdateStatus(id int64, status int) (int64, error) {
-	result, err := m.db.Exec("UPDATE `message_read` SET `status` = ? WHERE `id` = ?", status, id)
-	if err != nil {
-		return 0, err
-	}
-
-	return result.RowsAffected()
+	return m.Update(&models.MessageRead{
+		Id:     id,
+		Status: status,
+	}, "status")
 }

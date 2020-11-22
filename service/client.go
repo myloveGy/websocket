@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"github.com/jinxing-go/mysql"
 	"log"
 	"time"
 
@@ -80,7 +81,7 @@ func (c *Client) ReadPump() {
 		case entity.SocketHeartbeat:
 			responseMessage = Message{
 				Type: entity.SocketHeartbeat,
-				Time: utils.DateTime(),
+				Time: mysql.DateTime(),
 			}
 
 			// 关闭链接
@@ -99,7 +100,7 @@ func (c *Client) ReadPump() {
 				responseMessage = Message{
 					Type:    entity.SocketMessage,
 					Content: "你发的什么: " + err.Error(),
-					Time:    utils.DateTime(),
+					Time:    mysql.DateTime(),
 				}
 
 				break
@@ -112,7 +113,7 @@ func (c *Client) ReadPump() {
 				responseMessage = Message{
 					Type:    entity.SocketMessage,
 					Content: "机器人回复失败",
-					Time:    utils.DateTime(),
+					Time:    mysql.DateTime(),
 				}
 
 				break
@@ -121,7 +122,7 @@ func (c *Client) ReadPump() {
 			responseMessage = Message{
 				Type:    entity.SocketMessage,
 				Content: result.Content,
-				Time:    utils.DateTime(),
+				Time:    mysql.DateTime(),
 			}
 		}
 

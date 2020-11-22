@@ -4,7 +4,7 @@ package main
 
 import (
 	"github.com/google/wire"
-
+	"net/http"
 	"websocket/api/handler"
 	"websocket/api/handler/api"
 	"websocket/api/handler/push"
@@ -12,13 +12,22 @@ import (
 	"websocket/api/middleware"
 	"websocket/api/router"
 	"websocket/cache"
+	"websocket/config"
 	"websocket/connection"
 	"websocket/repo"
 )
 
+func NewHttp(router2 *router.Router) *http.Server {
+	return &http.Server{
+		Addr:           config.App.Address,
+		Handler:        router2.Run(),
+		MaxHeaderBytes: 1 << 20,
+	}
+}
+
 var providerSet = wire.NewSet(
 	// connection
-	connection.NewDB,
+	connection.NewMySQL,
 	connection.NewRedis,
 
 	cache.NewUserCache,
@@ -42,8 +51,10 @@ var providerSet = wire.NewSet(
 	router.NewRouter,
 
 	wire.Struct(new(handler.Handler), "*"),
+
+	NewHttp,
 )
 
-func Initialize() *router.Router {
+func Initialize() *http.Server {
 	panic(wire.Build(providerSet))
 }

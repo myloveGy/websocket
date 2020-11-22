@@ -10,7 +10,7 @@ import (
 )
 
 func (a *Api) Login(c *gin.Context) {
-	params := &request.UserLogin{}
+	params := &request.ApiLoginParams{}
 	if isError, err := utils.BindAndValid(c, params); isError {
 		response.InvalidParams(c, err)
 		return

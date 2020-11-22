@@ -1,7 +1,9 @@
 package repo
 
 import (
+	"fmt"
 	"testing"
+	"websocket/models"
 
 	"github.com/stretchr/testify/assert"
 
@@ -9,7 +11,7 @@ import (
 )
 
 func newTestUser() *User {
-	db := connection.NewDB()
+	db := connection.NewMySQL()
 	return NewUser(db)
 }
 
@@ -35,4 +37,37 @@ func TestUser_UpdateAccessToken(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, int64(1), u)
 	})
+}
+
+func TestUser_Create(t *testing.T) {
+	user := newTestUser()
+	t.Run("测试失败", func(t *testing.T) {
+		err := user.Create(&models.User{
+			Username:    "jinxing.liu",
+			Password:    "123456",
+			AccessToken: "789123",
+		})
+
+		fmt.Println(err)
+		assert.Error(t, err)
+	})
+
+	t.Run("测试正常", func(t *testing.T) {
+		user.Exec("DELETE FROM `user` WHERE `username` = ?", "jinxing.liu1")
+		err := user.Create(&models.User{
+			Username:    "jinxing.liu1",
+			Password:    "123456",
+			Phone:       "12345678901",
+			AccessToken: "789123",
+		})
+
+		fmt.Println(err)
+		assert.NoError(t, err)
+	})
+}
+
+func TestUser_Delete(t *testing.T) {
+	row, err := newTestUser().Delete(&models.User{UserId: 100})
+	assert.NoError(t, err)
+	assert.Equal(t, int64(0), row)
 }

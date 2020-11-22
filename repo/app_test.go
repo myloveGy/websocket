@@ -9,7 +9,7 @@ import (
 )
 
 func newTestAppRepo() *App {
-	db := connection.NewDB()
+	db := connection.NewMySQL()
 	return NewApp(db)
 }
 

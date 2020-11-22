@@ -1,15 +1,14 @@
 package handler
 
 import (
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
+	"github.com/jinxing-go/mysql"
 	"net/http"
 	"websocket/api/response"
 	"websocket/entity"
 	"websocket/repo"
 	"websocket/service"
-	"websocket/utils"
-
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 )
 
 var upgrade = websocket.Upgrader{
@@ -72,7 +71,7 @@ func (w *WS) WebSocket(c *gin.Context) {
 	client.Send <- service.Message{
 		Type:    entity.SocketConnection,
 		Content: "已经建立链接",
-		Time:    utils.DateTime(),
+		Time:    mysql.DateTime(),
 	}
 
 	go client.WritePump()

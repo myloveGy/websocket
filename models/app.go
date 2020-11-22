@@ -13,3 +13,11 @@ type App struct {
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
+
+func (*App) TableName() string {
+	return "app"
+}
+
+func (*App) PK() string {
+	return "id"
+}

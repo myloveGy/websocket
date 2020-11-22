@@ -7,6 +7,7 @@ package main
 
 import (
 	"github.com/google/wire"
+	"net/http"
 	"websocket/api/handler"
 	"websocket/api/handler/api"
 	"websocket/api/handler/push"
@@ -14,22 +15,23 @@ import (
 	"websocket/api/middleware"
 	"websocket/api/router"
 	"websocket/cache"
+	"websocket/config"
 	"websocket/connection"
 	"websocket/repo"
 )
 
 // Injectors from wire.go:
 
-func Initialize() *router.Router {
+func Initialize() *http.Server {
 	redis := connection.NewRedis()
 	userCache := cache.NewUserCache(redis)
-	db := connection.NewDB()
-	app := repo.NewApp(db)
+	mySQl := connection.NewMySQL()
+	app := repo.NewApp(mySQl)
 	middleWare := middleware.NewMiddleWare(userCache, app)
-	repoUser := repo.NewUser(db)
+	repoUser := repo.NewUser(mySQl)
 	apiApi := api.NewApi(userCache, repoUser)
-	message := repo.NewMessage(db)
-	messageRead := repo.NewMessageRead(db)
+	message := repo.NewMessage(mySQl)
+	messageRead := repo.NewMessageRead(mySQl)
 	pushPush := push.NewPush(message, messageRead)
 	userUser := user.NewUser()
 	ws := handler.NewWs(app)
@@ -40,9 +42,18 @@ func Initialize() *router.Router {
 		Ws:   ws,
 	}
 	routerRouter := router.NewRouter(middleWare, handlerHandler)
-	return routerRouter
+	server := NewHttp(routerRouter)
+	return server
 }
 
 // wire.go:
 
-var providerSet = wire.NewSet(connection.NewDB, connection.NewRedis, cache.NewUserCache, repo.NewApp, repo.NewMessage, repo.NewUser, repo.NewMessageRead, api.NewApi, push.NewPush, user.NewUser, handler.NewWs, middleware.NewMiddleWare, router.NewRouter, wire.Struct(new(handler.Handler), "*"))
+func NewHttp(router2 *router.Router) *http.Server {
+	return &http.Server{
+		Addr:           config.App.Address,
+		Handler:        router2.Run(),
+		MaxHeaderBytes: 1 << 20,
+	}
+}
+
+var providerSet = wire.NewSet(connection.NewMySQL, connection.NewRedis, cache.NewUserCache, repo.NewApp, repo.NewMessage, repo.NewUser, repo.NewMessageRead, api.NewApi, push.NewPush, user.NewUser, handler.NewWs, middleware.NewMiddleWare, router.NewRouter, wire.Struct(new(handler.Handler), "*"), NewHttp)

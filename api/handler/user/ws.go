@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/jinxing-go/mysql"
 	"strconv"
 	"websocket/api/response"
 	"websocket/helpers"
@@ -30,7 +31,7 @@ func (u *User) Ws(c *gin.Context) {
 
 	// 需要进行加密
 	data := map[string]interface{}{
-		"time":    utils.DateTime(),
+		"time":    mysql.DateTime(),
 		"user_id": strconv.FormatInt(user.UserId, 10),
 		"app_id":  app.AppId,
 	}

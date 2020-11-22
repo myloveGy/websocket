@@ -10,7 +10,7 @@ import (
 )
 
 func newTestMessageRead() *MessageRead {
-	db := connection.NewDB()
+	db := connection.NewMySQL()
 	return NewMessageRead(db)
 }
 
@@ -28,7 +28,7 @@ func TestMessageRead_Create(t *testing.T) {
 		err := messageReadRepo.Create(messageReadModel)
 		assert.NoError(t, err)
 
-		intRow, err1 := messageReadRepo.Delete(messageReadModel.Id)
+		intRow, err1 := messageReadRepo.Delete(&models.MessageRead{Id: messageReadModel.Id})
 		assert.NoError(t, err1)
 		assert.Equal(t, int64(1), intRow)
 	})

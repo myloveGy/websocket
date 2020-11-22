@@ -16,8 +16,9 @@ func (router *Router) Run() *gin.Engine {
 	// api
 	apiRouter := r.Group("/api")
 	{
-		apiRouter.GET("/detail", router.handler.Api.Detail) // 详情信息
-		apiRouter.POST("/login", router.handler.Api.Login)  // 用户登录
+		apiRouter.GET("/detail", router.handler.Api.Detail)      // 详情信息
+		apiRouter.POST("/login", router.handler.Api.Login)       // 用户登录
+		apiRouter.POST("/register", router.handler.Api.Register) // 用户注册
 	}
 
 	// 用户相关

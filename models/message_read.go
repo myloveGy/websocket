@@ -16,3 +16,11 @@ type MessageRead struct {
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
+
+func (*MessageRead) TableName() string {
+	return "message_read"
+}
+
+func (*MessageRead) PK() string {
+	return "id"
+}
