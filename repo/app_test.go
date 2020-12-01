@@ -3,18 +3,17 @@ package repo
 import (
 	"testing"
 
+	"github.com/jinxing-go/mysql"
 	"github.com/stretchr/testify/assert"
-
-	"websocket/connection"
 )
 
-func newTestAppRepo() *App {
-	db := connection.NewMySQL()
-	return NewApp(db)
+func newTestAppRepo(t *testing.T) *App {
+	mySQL := mysql.NewTestMySQL(t, "../testdata/websocket.sql")
+	return NewApp(mySQL)
 }
 
 func TestAppRepo_FindByAppId(t *testing.T) {
-	appRepo := newTestAppRepo()
+	appRepo := newTestAppRepo(t)
 
 	t.Run("测试正常", func(t *testing.T) {
 		_, err := appRepo.FindByAppId("2020110306161001")
@@ -28,7 +27,7 @@ func TestAppRepo_FindByAppId(t *testing.T) {
 }
 
 func TestAppRepo_FindById(t *testing.T) {
-	appRepo := newTestAppRepo()
+	appRepo := newTestAppRepo(t)
 	t.Run("测试正常", func(t *testing.T) {
 		_, err := appRepo.FindById(1)
 		assert.NoError(t, err)

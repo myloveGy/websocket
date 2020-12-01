@@ -1,13 +1,15 @@
 package config
 
 import (
-	"github.com/jinxing-go/mysql"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/jinxing-go/mysql"
+
 	config2 "websocket/pkg/config"
 )
 
@@ -30,8 +32,8 @@ type Config struct {
 	StartTime   time.Time
 	IsTesting   bool
 	PrivateKey  []byte
-	DB          map[string]*mysql.MySQLConfig `toml:"database"` // 数据库信息
-	Redis       map[string]*Redis             `toml:"redis"`
+	DB          map[string]*mysql.Config `toml:"database"` // 数据库信息
+	Redis       map[string]*Redis        `toml:"redis"`
 }
 
 var App = &Config{

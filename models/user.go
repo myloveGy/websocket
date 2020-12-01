@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"github.com/jinxing-go/mysql"
 )
 
@@ -22,4 +24,8 @@ func (*User) TableName() string {
 
 func (*User) PK() string {
 	return "user_id"
+}
+
+func (*User) TimestampsValue() interface{} {
+	return mysql.Time(time.Now())
 }

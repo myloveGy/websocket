@@ -3,20 +3,20 @@ package repo
 import (
 	"fmt"
 	"testing"
-	"websocket/models"
 
+	"github.com/jinxing-go/mysql"
 	"github.com/stretchr/testify/assert"
 
-	"websocket/connection"
+	"websocket/models"
 )
 
-func newTestUser() *User {
-	db := connection.NewMySQL()
-	return NewUser(db)
+func newTestUser(t *testing.T) *User {
+	mySQL := mysql.NewTestMySQL(t, "../testdata/websocket.sql")
+	return NewUser(mySQL)
 }
 
 func TestUserRepo_FindByUsername(t *testing.T) {
-	user := newTestUser()
+	user := newTestUser(t)
 	t.Run("查询正常", func(t *testing.T) {
 		u, err := user.FindByUsername("jinxing.liu")
 		assert.NoError(t, err)
@@ -31,7 +31,7 @@ func TestUserRepo_FindByUsername(t *testing.T) {
 }
 
 func TestUser_UpdateAccessToken(t *testing.T) {
-	user := newTestUser()
+	user := newTestUser(t)
 	t.Run("测试修改", func(t *testing.T) {
 		u, err := user.UpdateAccessToken(1, "jinxing.liu")
 		assert.NoError(t, err)
@@ -40,12 +40,15 @@ func TestUser_UpdateAccessToken(t *testing.T) {
 }
 
 func TestUser_Create(t *testing.T) {
-	user := newTestUser()
+	user := newTestUser(t)
 	t.Run("测试失败", func(t *testing.T) {
 		err := user.Create(&models.User{
 			Username:    "jinxing.liu",
 			Password:    "123456",
 			AccessToken: "789123",
+			AppId:       1,
+			Phone:       "1",
+			Status:      1,
 		})
 
 		fmt.Println(err)
@@ -59,6 +62,7 @@ func TestUser_Create(t *testing.T) {
 			Password:    "123456",
 			Phone:       "12345678901",
 			AccessToken: "789123",
+			AppId:       1,
 		})
 
 		fmt.Println(err)
@@ -67,7 +71,7 @@ func TestUser_Create(t *testing.T) {
 }
 
 func TestUser_Delete(t *testing.T) {
-	row, err := newTestUser().Delete(&models.User{UserId: 100})
+	row, err := newTestUser(t).Delete(&models.User{UserId: 100})
 	assert.NoError(t, err)
 	assert.Equal(t, int64(0), row)
 }
