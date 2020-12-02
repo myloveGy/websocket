@@ -3,22 +3,22 @@ package push
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinxing-go/mysql"
+
 	"websocket/api/response"
 	"websocket/entity"
 	"websocket/models"
-	"websocket/repo"
 	"websocket/request"
 	"websocket/service"
+	"websocket/service/api"
 	"websocket/utils"
 )
 
 type Push struct {
-	messageRepo     *repo.Message
-	messageReadRepo *repo.MessageRead
+	messageService *api.MessageService
 }
 
-func NewPush(messageRepo *repo.Message, messageReadRepo *repo.MessageRead) *Push {
-	return &Push{messageRepo: messageRepo, messageReadRepo: messageReadRepo}
+func NewPush(messageService *api.MessageService) *Push {
+	return &Push{messageService: messageService}
 }
 
 func (p *Push) User(context *gin.Context) {
@@ -60,36 +60,15 @@ func (p *Push) User(context *gin.Context) {
 		}
 	}
 
-	// 添加数据入库
-	m := &models.Message{
-		Content: params.Content,
-		Type:    params.Type,
-		AppId:   appModel.Id,
-	}
-
 	// 添加消息
-	if err := p.messageRepo.Create(m); err != nil {
+	if err := p.messageService.BatchCreateUserMessage(appModel.Id, []string{params.UserId}, params.Message); err != nil {
 		response.SystemError(context, "添加消息失败")
-		return
-	}
-
-	// 添加用户消息
-	mRead := &models.MessageRead{
-		AppId:     m.AppId,
-		MessageId: m.MessageId,
-		UserId:    params.UserId,
-	}
-
-	if err := p.messageReadRepo.Create(mRead); err != nil {
-		response.SystemError(context, "添加用户消息失败")
 		return
 	}
 
 	// 响应数据
 	response.Success(context, map[string]interface{}{
 		"online":     false,
-		"id":         mRead.Id,
-		"message_id": mRead.MessageId,
 		"user_id":    params.UserId,
 		"content":    params.Content,
 		"type":       params.Type,

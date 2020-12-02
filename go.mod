@@ -12,8 +12,7 @@ require (
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/google/wire v0.4.0
 	github.com/gorilla/websocket v1.4.2
-	github.com/jinxing-go/mysql v1.0.1
-	github.com/jmoiron/sqlx v1.2.0
+	github.com/jinxing-go/mysql v1.0.2
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
@@ -24,3 +23,5 @@ require (
 	golang.org/x/sys v0.0.0-20201101102859-da207088b7d1 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 )
+
+replace github.com/jinxing-go/mysql => /go-project/my-project/mysql
