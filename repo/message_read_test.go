@@ -3,14 +3,14 @@ package repo
 import (
 	"testing"
 
-	"github.com/jinxing-go/mysql"
 	"github.com/stretchr/testify/assert"
+
 	"websocket/models"
+	"websocket/testdata"
 )
 
 func newTestMessageRead(t *testing.T) *MessageRead {
-	mySQL := mysql.NewTestMySQL(t, "../testdata/websocket.sql")
-	return NewMessageRead(mySQL)
+	return NewMessageRead(testdata.NewTestMySQL(t))
 }
 
 func TestMessageRead_Create(t *testing.T) {

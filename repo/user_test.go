@@ -4,15 +4,14 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/jinxing-go/mysql"
 	"github.com/stretchr/testify/assert"
 
 	"websocket/models"
+	"websocket/testdata"
 )
 
 func newTestUser(t *testing.T) *User {
-	mySQL := mysql.NewTestMySQL(t, "../testdata/websocket.sql")
-	return NewUser(mySQL)
+	return NewUser(testdata.NewTestMySQL(t))
 }
 
 func TestUserRepo_FindByUsername(t *testing.T) {

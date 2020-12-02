@@ -3,13 +3,13 @@ package repo
 import (
 	"testing"
 
-	"github.com/jinxing-go/mysql"
 	"github.com/stretchr/testify/assert"
+
+	"websocket/testdata"
 )
 
 func newTestAppRepo(t *testing.T) *App {
-	mySQL := mysql.NewTestMySQL(t, "../testdata/websocket.sql")
-	return NewApp(mySQL)
+	return NewApp(testdata.NewTestMySQL(t))
 }
 
 func TestAppRepo_FindByAppId(t *testing.T) {

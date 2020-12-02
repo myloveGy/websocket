@@ -4,15 +4,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jinxing-go/mysql"
 	"github.com/stretchr/testify/assert"
 
 	"websocket/models"
+	"websocket/testdata"
 )
 
 func newTestMessageRepo(t *testing.T) *Message {
-	mySQL := mysql.NewTestMySQL(t, "../testdata/websocket.sql")
-	return NewMessage(mySQL)
+	return NewMessage(testdata.NewTestMySQL(t))
 }
 
 func TestMessage_Create(t *testing.T) {

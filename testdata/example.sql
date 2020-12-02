@@ -12,9 +12,6 @@ CREATE TABLE `app` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unq_app_id` (`app_id`) COMMENT 'app_id必须唯一'
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='应用信息';
-
-INSERT INTO `app` VALUES (1, '2020110306161001', '777c9ce7926298d2bf7930436d7dd03a', '主要应用', 1, '2020-11-03 18:16:31', '2020-11-03 18:16:34');
-
 DROP TABLE IF EXISTS `message`;
 CREATE TABLE `message` (
   `message_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -26,8 +23,6 @@ CREATE TABLE `message` (
   KEY `idx_user_id` (`type`),
   KEY `idx_create_at` (`created_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='消息信息';
-INSERT INTO `message` VALUES (1, 1, 1, '{\"username\":\"jinxing.liu\", \"age\": 28}', '2020-11-20 18:12:36');
-INSERT INTO `message` VALUES (2, 1, 1, '{\"username\":\"jinxing.liu\", \"age\": 28}', '2020-11-20 18:12:59');
 DROP TABLE IF EXISTS `message_read`;
 CREATE TABLE `message_read` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -44,8 +39,6 @@ CREATE TABLE `message_read` (
   KEY `idx_group_id` (`group_id`),
   KEY `idx_create_at` (`created_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='消息读取记录信息';
-INSERT INTO `message_read` VALUES (1, '1', 1, '2', '', 1, '2020-11-20 18:12:37', '2020-11-20 18:12:37');
-INSERT INTO `message_read` VALUES (2, '2', 1, '2', '', 1, '2020-11-20 18:12:59', '2020-11-20 18:12:59');
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -61,5 +54,12 @@ CREATE TABLE `user` (
   UNIQUE KEY `unq_phone` (`phone`) COMMENT '手机号唯一',
   UNIQUE KEY `unq_username` (`username`) COMMENT '用户名唯一'
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='用户信息';
+
+
+INSERT INTO `app` VALUES (1, '2020110306161001', '777c9ce7926298d2bf7930436d7dd03a', '主要应用', 1, '2020-11-03 18:16:31', '2020-11-03 18:16:34');
+INSERT INTO `message` VALUES (1, 1, 1, '{\"username\":\"jinxing.liu\", \"age\": 28}', '2020-11-20 18:12:36');
+INSERT INTO `message` VALUES (2, 1, 1, '{\"username\":\"jinxing.liu\", \"age\": 28}', '2020-11-20 18:12:59');
+INSERT INTO `message_read` VALUES (1, '1', 1, '2', '', 1, '2020-11-20 18:12:37', '2020-11-20 18:12:37');
+INSERT INTO `message_read` VALUES (2, '2', 1, '2', '', 1, '2020-11-20 18:12:59', '2020-11-20 18:12:59');
 INSERT INTO `user` VALUES (1, 1, 'jinxing.liu', '130****7932', 'v123456', 1, '0d91e6f2f98****527880', '2020-11-19 11:46:41', '2020-11-20 18:15:44');
 SET FOREIGN_KEY_CHECKS = 1;
