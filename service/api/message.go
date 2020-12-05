@@ -1,7 +1,9 @@
 package api
 
 import (
+	"errors"
 	"github.com/jinxing-go/mysql"
+	"websocket/entity"
 
 	"websocket/models"
 	"websocket/repo"
@@ -20,32 +22,40 @@ func NewMessageService(messageRepo *repo.Message, messageReadRepo *repo.MessageR
 	}
 }
 
-func (m *MessageService) BatchCreateUserMessage(appId int64, userIds []string, message request.Message) error {
+func (m *MessageService) Create(appId int64, params request.Message) (*models.Message, error) {
+	model := &models.Message{
+		AppId:   appId,
+		Type:    params.Type,
+		GroupId: params.GroupId,
+		Content: params.Content,
+	}
+
+	if err := m.messageRepo.Create(model); err != nil {
+		return nil, errors.New(entity.ErrCreateMessage)
+	}
+
+	return model, nil
+}
+
+func (m *MessageService) CreateUserMessage(userIds []string, message *models.Message) error {
 	// 开启事务处理
-	return m.messageRepo.Transaction(func(mysql *mysql.MySQl) error {
-		// 新增消息内容
-		mModel := &models.Message{
-			Content: message.Content,
-			Type:    message.Type,
-			AppId:   appId,
-		}
-
-		if err := mysql.Create(mModel); err != nil {
-			return err
-		}
-
+	if err := m.messageRepo.Transaction(func(mysql *mysql.MySQl) error {
 		// 添加用户消息
 		for _, userId := range userIds {
 			if err := mysql.Create(&models.MessageRead{
-				MessageId: mModel.MessageId,
-				AppId:     mModel.AppId,
+				MessageId: message.MessageId,
+				AppId:     message.AppId,
 				UserId:    userId,
-				Status:    1,
+				Status:    entity.UserMessageUnread,
 			}); err != nil {
 				return err
 			}
 		}
 
 		return nil
-	})
+	}); err != nil {
+		return errors.New(entity.ErrCreateUserMessage)
+	}
+
+	return nil
 }

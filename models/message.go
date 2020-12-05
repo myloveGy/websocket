@@ -9,6 +9,7 @@ type Message struct {
 	AppId     int64     `db:"app_id" json:"app_id"`
 	Type      int       `db:"type" json:"type"`
 	Content   string    `db:"content" json:"content"`
+	GroupId   string    `db:"group_id" json:"group_id"`
 	CreatedAt time.Time `db:"created_at"`
 }
 

@@ -31,7 +31,7 @@ func (router *Router) Run() *gin.Engine {
 	pushRouter := r.Group("/ws/push", router.middleware.Sign())
 	{
 		pushRouter.POST("/user", router.handler.Push.User)  // 发送到指定用户
-		pushRouter.POST("/many", router.handler.Push.User)  // 发送到多个用户
+		pushRouter.POST("/many", router.handler.Push.Many)  // 发送到多个用户
 		pushRouter.POST("/all", router.handler.Push.User)   // 发送到全部用户
 		pushRouter.POST("/group", router.handler.Push.User) // 发送到指定分组
 	}

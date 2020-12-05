@@ -24,4 +24,5 @@ require (
 	google.golang.org/protobuf v1.25.0 // indirect
 )
 
-replace github.com/jinxing-go/mysql => /go-project/my-project/mysql
+// replace github.com/jinxing-go/mysql => /go-project/my-project/mysql
+replace github.com/jinxing-go/mysql => /Users/jinxing/project/mysql

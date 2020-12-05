@@ -5,6 +5,7 @@ import (
 	"github.com/jinxing-go/mysql"
 	"log"
 	"time"
+	"websocket/repo"
 
 	"websocket/models"
 
@@ -41,14 +42,19 @@ type Client struct {
 	Conn *websocket.Conn
 
 	// 发送消息
-	Send chan interface{}
+	Send chan *Message
+
+	MessageReadRepo *repo.MessageRead
 }
 
 // Message 发放的消息信息
 type Message struct {
-	Type    string `json:"type"`
-	Content string `json:"content,omitempty"`
-	Time    string `json:"time"`
+	Id          int64  `json:"id,omitempty"`
+	Type        string `json:"type"`
+	MessageId   int64  `json:"-"`
+	MessageType int    `json:"-"`
+	Content     string `json:"content,omitempty"`
+	Time        string `json:"time"`
 }
 
 func (c *Client) ReadPump() {
@@ -74,21 +80,18 @@ func (c *Client) ReadPump() {
 			break
 		}
 
-		var responseMessage Message
+		var responseMessage = &Message{
+			Type: msg.Type,
+		}
 
 		switch msg.Type {
-		// 心跳检测
-		case entity.SocketHeartbeat:
-			responseMessage = Message{
-				Type: entity.SocketHeartbeat,
-				Time: mysql.DateTime(),
-			}
-
-			// 关闭链接
+		// 关闭链接
 		case entity.SocketClose:
 			log.Printf("close: %v", msg)
 			_ = c.Conn.Close()
 			break
+		case entity.SocketMessageReceipt:
+
 		case entity.SocketMessage:
 			m := &struct {
 				Source  string `json:"source"`
@@ -97,36 +100,22 @@ func (c *Client) ReadPump() {
 
 			err := json.Unmarshal([]byte(msg.Content), m)
 			if err != nil {
-				responseMessage = Message{
-					Type:    entity.SocketMessage,
-					Content: "你发的什么: " + err.Error(),
-					Time:    mysql.DateTime(),
-				}
-
+				responseMessage.Content = "你发的什么: " + err.Error()
 				break
 			}
 
 			result, err := utils.GetHTTP(m.Content)
 			if err != nil || result.Code != 0 {
 				log.Printf("机器人回复失败：%v\n", err)
-
-				responseMessage = Message{
-					Type:    entity.SocketMessage,
-					Content: "机器人回复失败",
-					Time:    mysql.DateTime(),
-				}
-
+				responseMessage.Content = "机器人回复失败"
 				break
 			}
 
-			responseMessage = Message{
-				Type:    entity.SocketMessage,
-				Content: result.Content,
-				Time:    mysql.DateTime(),
-			}
+			responseMessage.Content = result.Content
 		}
 
 		if responseMessage.Type != "" {
+			responseMessage.Time = mysql.DateTime()
 			c.Send <- responseMessage
 		}
 	}
@@ -151,6 +140,11 @@ func (c *Client) WritePump() {
 			err := c.Conn.WriteJSON(message)
 			if err != nil {
 				return
+			}
+
+			// 如果消息为临时消息，需要标记为已经读取
+			if message.MessageType == entity.MessageTypeTemp && message.Id > 0 && c.MessageReadRepo != nil {
+				c.MessageReadRepo.UpdateStatus(message.Id, entity.UserMessageRead)
 			}
 		case <-ticker.C:
 			c.Conn.SetWriteDeadline(time.Now().Add(writeWait))

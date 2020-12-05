@@ -15,6 +15,7 @@ import (
 	"websocket/config"
 	"websocket/connection"
 	"websocket/repo"
+	serviceApi "websocket/service/api"
 )
 
 func NewHttp(router2 *router.Router) *http.Server {
@@ -43,6 +44,9 @@ var providerSet = wire.NewSet(
 	push.NewPush,
 	user.NewUser,
 	handler.NewWs,
+
+	// api 服务
+	serviceApi.NewMessageService,
 
 	// middleWare
 	middleware.NewMiddleWare,

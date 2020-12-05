@@ -1,6 +1,7 @@
 package push
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/jinxing-go/mysql"
 
@@ -23,55 +24,76 @@ func NewPush(messageService *api.MessageService) *Push {
 
 func (p *Push) User(context *gin.Context) {
 	// 验证绑定数据
-	params := &request.UserParams{}
+	params := &request.PushUserParams{}
 	if isError, err := utils.BindAndValid(context, params); isError {
 		response.InvalidParams(context, err.Error())
 		return
 	}
 
 	// 获取应用消息
-	app, ok := context.Get("app")
-	appModel, ok1 := app.(*models.App)
-	if !ok || !ok1 {
-		response.BusinessError(context, "APP信息错误")
+	app, err := p.getApp(context)
+	if err != nil {
+		response.BusinessError(context, err)
 		return
 	}
 
-	if value, ok := service.GlobalHub.Apps[appModel.Id]; ok {
+	// 添加消息
+	message, err := p.messageService.Create(app.Id, params.Message)
+	if err != nil {
+		response.BusinessError(context, err)
+		return
+	}
+
+	// 返回消息内容
+	resp := &request.PushUserResponse{
+		Online:  false,
+		UserId:  params.UserId,
+		Message: params.Message,
+	}
+
+	if value, ok := service.GlobalHub.Apps[app.Id]; ok {
 		if user, ok1 := value.Users[params.UserId]; ok1 {
 			for _, client := range user {
-				client.Send <- service.Message{
-					Type:    entity.SocketConnection,
-					Content: params.Content,
-					Time:    mysql.DateTime(),
+				client.Send <- &service.Message{
+					MessageId:   message.MessageId,
+					MessageType: message.Type,
+					Content:     message.Content,
+					Type:        entity.SocketMessage,
+					Time:        mysql.DateTime(),
 				}
 			}
 
 			// 响应数据
-			response.Success(context, map[string]interface{}{
-				"online":     true,
-				"user_id":    params.UserId,
-				"content":    params.Content,
-				"type":       params.Type,
-				"created_at": mysql.DateTime(),
-			})
-
-			return
+			resp.Online = true
+			if message.Type == entity.MessageTypeTemp {
+				response.Success(context, resp)
+				return
+			}
 		}
 	}
 
 	// 添加消息
-	if err := p.messageService.BatchCreateUserMessage(appModel.Id, []string{params.UserId}, params.Message); err != nil {
-		response.SystemError(context, "添加消息失败")
+	if err := p.messageService.CreateUserMessage([]string{params.UserId}, message); err != nil {
+		response.SystemError(context, err)
 		return
 	}
 
 	// 响应数据
-	response.Success(context, map[string]interface{}{
-		"online":     false,
-		"user_id":    params.UserId,
-		"content":    params.Content,
-		"type":       params.Type,
-		"created_at": mysql.DateTime(),
-	})
+	response.Success(context, resp)
+}
+
+func (p *Push) getApp(context *gin.Context) (*models.App, error) {
+	// 获取应用消息
+	app, ok := context.Get("app")
+	if !ok {
+		return nil, errors.New(entity.ErrAppNoTExists)
+	}
+
+	// 断言成App
+	model, ok1 := app.(*models.App)
+	if !ok1 {
+		return nil, errors.New(entity.ErrApp)
+	}
+
+	return model, nil
 }

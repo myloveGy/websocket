@@ -38,3 +38,6 @@ fmt-check:
 
 vet:
 	$(GO) vet $(VETPACKAGES)
+
+http: fmt-check generate build
+	./app

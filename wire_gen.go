@@ -18,6 +18,7 @@ import (
 	"websocket/config"
 	"websocket/connection"
 	"websocket/repo"
+	api2 "websocket/service/api"
 )
 
 // Injectors from wire.go:
@@ -32,9 +33,10 @@ func Initialize() *http.Server {
 	apiApi := api.NewApi(userCache, repoUser)
 	message := repo.NewMessage(mySQl)
 	messageRead := repo.NewMessageRead(mySQl)
-	pushPush := push.NewPush(message, messageRead)
+	messageService := api2.NewMessageService(message, messageRead)
+	pushPush := push.NewPush(messageService)
 	userUser := user.NewUser()
-	ws := handler.NewWs(app)
+	ws := handler.NewWs(app, messageRead)
 	handlerHandler := &handler.Handler{
 		Api:  apiApi,
 		Push: pushPush,
@@ -56,4 +58,4 @@ func NewHttp(router2 *router.Router) *http.Server {
 	}
 }
 
-var providerSet = wire.NewSet(connection.NewMySQL, connection.NewRedis, cache.NewUserCache, repo.NewApp, repo.NewMessage, repo.NewUser, repo.NewMessageRead, api.NewApi, push.NewPush, user.NewUser, handler.NewWs, middleware.NewMiddleWare, router.NewRouter, wire.Struct(new(handler.Handler), "*"), NewHttp)
+var providerSet = wire.NewSet(connection.NewMySQL, connection.NewRedis, cache.NewUserCache, repo.NewApp, repo.NewMessage, repo.NewUser, repo.NewMessageRead, api.NewApi, push.NewPush, user.NewUser, handler.NewWs, api2.NewMessageService, middleware.NewMiddleWare, router.NewRouter, wire.Struct(new(handler.Handler), "*"), NewHttp)

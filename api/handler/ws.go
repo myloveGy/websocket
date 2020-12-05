@@ -18,11 +18,12 @@ var upgrade = websocket.Upgrader{
 }
 
 type WS struct {
-	appRepo *repo.App
+	appRepo         *repo.App
+	messageReadRepo *repo.MessageRead
 }
 
-func NewWs(app *repo.App) *WS {
-	return &WS{appRepo: app}
+func NewWs(app *repo.App, messageReadRepo *repo.MessageRead) *WS {
+	return &WS{appRepo: app, messageReadRepo: messageReadRepo}
 }
 
 // WebSocket 处理websocket 信息
@@ -30,26 +31,26 @@ func (w *WS) WebSocket(c *gin.Context) {
 	// 验证参数
 	appId := c.Param("app_id")
 	if appId == "" {
-		response.InvalidParams(c, "传递参数错误")
+		response.InvalidParams(c)
 		return
 	}
 
 	// 查询应用信息
 	app, err := w.appRepo.FindByAppId(c.Param("app_id"))
 	if err != nil {
-		response.InvalidParams(c, "应用信息不存在: "+err.Error())
+		response.InvalidParams(c, entity.ErrAppNoTExists)
 		return
 	}
 
 	// 验证应用状态
 	if app.Status != entity.AppStatusActivate {
-		response.BusinessError(c, "应用信息已经被停用")
+		response.BusinessError(c, entity.ErrAppDisable)
 		return
 	}
 
-	user_id := c.Query("user_id")
-	if user_id == "" {
-		response.InvalidParams(c, "user_id不能为空")
+	userId := c.Query("user_id")
+	if userId == "" {
+		response.InvalidParams(c, entity.ErrUserNotEmpty)
 		return
 	}
 
@@ -60,18 +61,33 @@ func (w *WS) WebSocket(c *gin.Context) {
 	}
 
 	client := &service.Client{
-		Hub:    service.GlobalHub,
-		Conn:   conn,
-		Send:   make(chan interface{}, 256),
-		UserId: user_id,
-		App:    app,
+		Hub:             service.GlobalHub,
+		Conn:            conn,
+		Send:            make(chan *service.Message, 256),
+		UserId:          userId,
+		App:             app,
+		MessageReadRepo: w.messageReadRepo,
 	}
 
 	client.Hub.Register <- client
-	client.Send <- service.Message{
+	client.Send <- &service.Message{
 		Type:    entity.SocketConnection,
 		Content: "已经建立链接",
 		Time:    mysql.DateTime(),
+	}
+
+	// 查询用户信息
+	if messageList, err := w.messageReadRepo.FindAll(app.Id, userId, entity.UserMessageUnread); err == nil {
+		for _, v := range messageList {
+			client.Send <- &service.Message{
+				Id:          v.Id,
+				MessageId:   v.MessageId,
+				MessageType: v.Type,
+				Type:        entity.SocketMessage,
+				Content:     v.Content,
+				Time:        mysql.DateTime(),
+			}
+		}
 	}
 
 	go client.WritePump()
