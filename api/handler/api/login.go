@@ -24,7 +24,7 @@ func (a *Api) Login(c *gin.Context) {
 	}
 
 	// 验证密码是否正确
-	if user.Password != params.Password {
+	if !utils.ValidatePassword(params.Password, user.Password) {
 		response.BusinessError(c, "登录账户或者密码错误")
 		return
 	}

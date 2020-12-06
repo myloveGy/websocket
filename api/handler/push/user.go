@@ -38,7 +38,7 @@ func (p *Push) User(context *gin.Context) {
 	}
 
 	// 添加消息
-	message, err := p.messageService.Create(app.Id, params.Message)
+	messageList, err := p.messageService.CreateUserMessageList(app.Id, params.Message, []string{params.UserId})
 	if err != nil {
 		response.BusinessError(context, err)
 		return
@@ -52,30 +52,23 @@ func (p *Push) User(context *gin.Context) {
 	}
 
 	if value, ok := service.GlobalHub.Apps[app.Id]; ok {
-		if user, ok1 := value.Users[params.UserId]; ok1 {
-			for _, client := range user {
-				client.Send <- &service.Message{
-					MessageId:   message.MessageId,
-					MessageType: message.Type,
-					Content:     message.Content,
-					Type:        entity.SocketMessage,
-					Time:        mysql.DateTime(),
+		for _, message := range messageList {
+			if user, ok1 := value.Users[params.UserId]; ok1 {
+				for _, client := range user {
+					client.Send <- &service.Message{
+						Id:          message.Id,
+						MessageId:   message.MessageId,
+						MessageType: params.Type,
+						Content:     params.Content,
+						Type:        entity.SocketMessage,
+						Time:        mysql.DateTime(),
+					}
 				}
-			}
 
-			// 响应数据
-			resp.Online = true
-			if message.Type == entity.MessageTypeTemp {
-				response.Success(context, resp)
-				return
+				// 响应数据
+				resp.Online = true
 			}
 		}
-	}
-
-	// 添加消息
-	if err := p.messageService.CreateUserMessage([]string{params.UserId}, message); err != nil {
-		response.SystemError(context, err)
-		return
 	}
 
 	// 响应数据

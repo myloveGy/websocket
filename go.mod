@@ -19,7 +19,7 @@ require (
 	github.com/pelletier/go-toml v1.8.1
 	github.com/stretchr/testify v1.6.1
 	github.com/ugorji/go v1.1.13 // indirect
-	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
+	golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c
 	golang.org/x/sys v0.0.0-20201101102859-da207088b7d1 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 )

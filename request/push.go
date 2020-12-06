@@ -28,5 +28,5 @@ type PushManyResponse struct {
 type Message struct {
 	Content string `json:"content" binding:"required"`
 	Type    int    `json:"type" binding:"required,oneof=1 2"`
-	GroupId string `json:"group_id"`
+	GroupId string `json:"group_id,omitempty"`
 }

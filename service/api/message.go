@@ -22,19 +22,43 @@ func NewMessageService(messageRepo *repo.Message, messageReadRepo *repo.MessageR
 	}
 }
 
-func (m *MessageService) Create(appId int64, params request.Message) (*models.Message, error) {
-	model := &models.Message{
-		AppId:   appId,
-		Type:    params.Type,
-		GroupId: params.GroupId,
-		Content: params.Content,
+// CreateUserMessageList 批量添加用户消息信息
+func (m *MessageService) CreateUserMessageList(appId int64, params request.Message, users []string) ([]*models.MessageRead, error) {
+	messageModels := make([]*models.MessageRead, 0)
+	// 开启事务处理
+	if err := m.messageRepo.Transaction(func(mysql *mysql.MySQl) error {
+		// 第一步：添加消息信息
+		model := &models.Message{
+			AppId:   appId,
+			Type:    params.Type,
+			GroupId: params.GroupId,
+			Content: params.Content,
+		}
+
+		if err := m.messageRepo.Create(model); err != nil {
+			return errors.New(entity.ErrCreateMessage)
+		}
+
+		for _, userId := range users {
+			message := &models.MessageRead{
+				MessageId: model.MessageId,
+				AppId:     model.AppId,
+				UserId:    userId,
+				Status:    entity.UserMessageUnread,
+			}
+
+			if err := mysql.Create(message); err != nil {
+				return errors.New(entity.ErrCreateUserMessage)
+			}
+
+			messageModels = append(messageModels, message)
+		}
+		return nil
+	}); err != nil {
+		return nil, err
 	}
 
-	if err := m.messageRepo.Create(model); err != nil {
-		return nil, errors.New(entity.ErrCreateMessage)
-	}
-
-	return model, nil
+	return messageModels, nil
 }
 
 func (m *MessageService) CreateUserMessage(userIds []string, message *models.Message) error {

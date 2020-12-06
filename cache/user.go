@@ -3,6 +3,7 @@ package cache
 import (
 	"fmt"
 	"time"
+	"websocket/config"
 	"websocket/connection"
 	"websocket/models"
 )
@@ -29,7 +30,7 @@ func (u *UserCache) Get(accessToken string) (*models.User, error) {
 }
 
 func (u *UserCache) Set(accessToken string, m *models.User) error {
-	return u.rds.Set(u.key(accessToken), m, time.Hour)
+	return u.rds.Set(u.key(accessToken), m, time.Hour*config.App.LoginTime)
 }
 
 func (u *UserCache) Delete(accessToken string) error {

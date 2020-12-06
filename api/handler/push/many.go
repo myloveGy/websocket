@@ -34,7 +34,7 @@ func (p *Push) Many(context *gin.Context) {
 	}
 
 	// 添加消息
-	message, err := p.messageService.Create(app.Id, params.Message)
+	messageList, err := p.messageService.CreateUserMessageList(app.Id, params.Message, users)
 	if err != nil {
 		response.BusinessError(context, err)
 		return
@@ -48,10 +48,11 @@ func (p *Push) Many(context *gin.Context) {
 	}
 
 	if value, ok := service.GlobalHub.Apps[app.Id]; ok {
-		for _, userId := range users {
-			if user, ok1 := value.Users[userId]; ok1 {
+		for _, message := range messageList {
+			if user, ok1 := value.Users[message.UserId]; ok1 {
 				for _, client := range user {
 					client.Send <- &service.Message{
+						Id:          message.Id,
 						MessageId:   message.MessageId,
 						Type:        entity.SocketMessage,
 						MessageType: params.Type,
@@ -60,23 +61,11 @@ func (p *Push) Many(context *gin.Context) {
 					}
 				}
 
-				resp.OnlineUsers = append(resp.OnlineUsers, userId)
+				resp.OnlineUsers = append(resp.OnlineUsers, message.UserId)
 			} else {
-				resp.OfflineUsers = append(resp.OfflineUsers, userId)
+				resp.OfflineUsers = append(resp.OfflineUsers, message.UserId)
 			}
 		}
-	} else {
-		resp.OfflineUsers = users
-	}
-
-	if params.Type == entity.MessageTypeTemp {
-		users = resp.OfflineUsers
-	}
-
-	// 添加消息
-	if err := p.messageService.CreateUserMessage(users, message); err != nil {
-		response.SystemError(context, err)
-		return
 	}
 
 	// 响应数据

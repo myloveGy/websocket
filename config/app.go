@@ -26,9 +26,10 @@ type Config struct {
 	Debug       string `toml:"debug"`
 	Token       string `toml:"token"`
 	StaticUrl   string `toml:"static_url"` // 前端地址
-	Env         string
+	Env         string `toml:"env"`
 	Path        string
-	Address     string `toml:"address"` // 启用的端口
+	Address     string        `toml:"address"`    // 启用的端口
+	LoginTime   time.Duration `toml:"login_time"` // 登录的事件
 	StartTime   time.Time
 	IsTesting   bool
 	PrivateKey  []byte

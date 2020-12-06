@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/jinxing-go/mysql"
 	"log"
 	"time"
@@ -57,6 +58,16 @@ type Message struct {
 	Time        string `json:"time"`
 }
 
+type ReplyMessage struct {
+	Id int64 `json:"id"`
+}
+
+type ReplyMessageResponse struct {
+	Id      int64  `json:"id"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}
+
 func (c *Client) ReadPump() {
 	defer func() {
 		c.Hub.Unregister <- c
@@ -91,6 +102,37 @@ func (c *Client) ReadPump() {
 			_ = c.Conn.Close()
 			break
 		case entity.SocketMessageReceipt:
+			m := &ReplyMessage{}
+			// 解析消息信息
+			if err := json.Unmarshal([]byte(msg.Content), m); err != nil {
+				str, _ := json.Marshal(&ReplyMessageResponse{
+					Status:  "error",
+					Message: fmt.Sprintf("%s(%s)", entity.ErrDecodeReplyMessage, msg.Content),
+				})
+
+				responseMessage.Content = string(str)
+				break
+			}
+
+			// 修改消息信息
+			if _, err := c.MessageReadRepo.UpdateStatus(m.Id, entity.UserMessageRead); err != nil {
+				str, _ := json.Marshal(&ReplyMessageResponse{
+					Id:      m.Id,
+					Status:  "error",
+					Message: entity.ErrUpdateUserMessage,
+				})
+
+				responseMessage.Content = string(str)
+				break
+			}
+
+			str, _ := json.Marshal(&ReplyMessageResponse{
+				Id:      m.Id,
+				Status:  "success",
+				Message: "OK",
+			})
+
+			responseMessage.Content = string(str)
 
 		case entity.SocketMessage:
 			m := &struct {
