@@ -16,6 +16,9 @@ const (
 	UserMessageUnread = 1 // 未读
 	UserMessageRead   = 2 // 已经读取
 
+	UserStatusActivate = 1 // 启用
+	UserStatusDisabled = 2 // 体用
+
 	// 消息类型
 	MessageTypeTemp       = 1 // 临时消息
 	MessageTypeNeedReplay = 2 // 必须回复消息

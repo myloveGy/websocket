@@ -9,6 +9,7 @@ import (
 	"github.com/google/wire"
 	"net/http"
 	"websocket/api/handler"
+	user2 "websocket/api/handler/admin/user"
 	"websocket/api/handler/api"
 	"websocket/api/handler/push"
 	"websocket/api/handler/user"
@@ -37,11 +38,14 @@ func Initialize() *http.Server {
 	pushPush := push.NewPush(messageService)
 	userUser := user.NewUser()
 	ws := handler.NewWs(app, messageRead)
+	userService := api2.NewUserService(repoUser)
+	user3 := user2.NewUser(userService)
 	handlerHandler := &handler.Handler{
-		Api:  apiApi,
-		Push: pushPush,
-		User: userUser,
-		Ws:   ws,
+		Api:       apiApi,
+		Push:      pushPush,
+		User:      userUser,
+		Ws:        ws,
+		AdminUser: user3,
 	}
 	routerRouter := router.NewRouter(middleWare, handlerHandler)
 	server := NewHttp(routerRouter)
@@ -58,4 +62,4 @@ func NewHttp(router2 *router.Router) *http.Server {
 	}
 }
 
-var providerSet = wire.NewSet(connection.NewMySQL, connection.NewRedis, cache.NewUserCache, repo.NewApp, repo.NewMessage, repo.NewUser, repo.NewMessageRead, api.NewApi, push.NewPush, user.NewUser, handler.NewWs, api2.NewMessageService, middleware.NewMiddleWare, router.NewRouter, wire.Struct(new(handler.Handler), "*"), NewHttp)
+var providerSet = wire.NewSet(connection.NewMySQL, connection.NewRedis, cache.NewUserCache, repo.NewApp, repo.NewMessage, repo.NewUser, repo.NewMessageRead, api.NewApi, push.NewPush, user.NewUser, handler.NewWs, user2.NewUser, api2.NewMessageService, api2.NewUserService, middleware.NewMiddleWare, router.NewRouter, wire.Struct(new(handler.Handler), "*"), NewHttp)

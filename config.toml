@@ -5,6 +5,7 @@ storage_path = "/data/app/"
 address = ":3000"
 static_url = "public/"
 login_time = 2
+default_page_size = 10
 
 [database]
 [database.default]

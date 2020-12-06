@@ -9,4 +9,6 @@ const (
 	ErrCreateUserMessage  = "创建用户消息失败"
 	ErrDecodeReplyMessage = "解析回复消息失败"
 	ErrUpdateUserMessage  = "标记用户消息已读失败"
+	ErrUserNotExists      = "用户信息不存在"
+	ErrUserUpdateStatus   = "修改用户状态失败"
 )

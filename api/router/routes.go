@@ -13,6 +13,25 @@ func (router *Router) Run() *gin.Engine {
 	r := gin.Default()
 
 	r.Use(router.middleware.Translations())
+
+	// 后端接口
+	adminRouter := r.Group("/admin")
+	{
+		// 用户信息
+		adminRouter.POST("/user/list", router.handler.AdminUser.List)
+		adminRouter.POST("/user/create", router.handler.AdminUser.List)
+		adminRouter.POST("/user/update", router.handler.AdminUser.List)
+		adminRouter.POST("/user/offline", router.handler.AdminUser.Offline)
+		adminRouter.POST("/user/online", router.handler.AdminUser.Online)
+
+		// 应用信息
+		adminRouter.POST("/app/list", router.handler.AdminUser.List)
+		adminRouter.POST("/app/create", router.handler.AdminUser.List)
+		adminRouter.POST("/app/update", router.handler.AdminUser.List)
+		adminRouter.POST("/app/offline", router.handler.AdminUser.List)
+		adminRouter.POST("/app/online", router.handler.AdminUser.List)
+	}
+
 	// api
 	apiRouter := r.Group("/api")
 	{

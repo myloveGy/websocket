@@ -6,6 +6,7 @@ import (
 	"github.com/google/wire"
 	"net/http"
 	"websocket/api/handler"
+	adminUser "websocket/api/handler/admin/user"
 	"websocket/api/handler/api"
 	"websocket/api/handler/push"
 	"websocket/api/handler/user"
@@ -44,9 +45,11 @@ var providerSet = wire.NewSet(
 	push.NewPush,
 	user.NewUser,
 	handler.NewWs,
+	adminUser.NewUser,
 
 	// api 服务
 	serviceApi.NewMessageService,
+	serviceApi.NewUserService,
 
 	// middleWare
 	middleware.NewMiddleWare,

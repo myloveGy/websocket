@@ -21,20 +21,21 @@ type Redis struct {
 }
 
 type Config struct {
-	AppName     string `toml:"app_name"`
-	StoragePath string `toml:"storage_path"`
-	Debug       string `toml:"debug"`
-	Token       string `toml:"token"`
-	StaticUrl   string `toml:"static_url"` // 前端地址
-	Env         string `toml:"env"`
-	Path        string
-	Address     string        `toml:"address"`    // 启用的端口
-	LoginTime   time.Duration `toml:"login_time"` // 登录的事件
-	StartTime   time.Time
-	IsTesting   bool
-	PrivateKey  []byte
-	DB          map[string]*mysql.Config `toml:"database"` // 数据库信息
-	Redis       map[string]*Redis        `toml:"redis"`
+	AppName         string `toml:"app_name"`
+	StoragePath     string `toml:"storage_path"`
+	Debug           string `toml:"debug"`
+	Token           string `toml:"token"`
+	StaticUrl       string `toml:"static_url"` // 前端地址
+	Env             string `toml:"env"`
+	Path            string
+	Address         string        `toml:"address"`           // 启用的端口
+	LoginTime       time.Duration `toml:"login_time"`        // 登录的事件
+	DefaultPageSize int           `toml:"default_page_size"` // 默认分页条数
+	StartTime       time.Time
+	IsTesting       bool
+	PrivateKey      []byte
+	DB              map[string]*mysql.Config `toml:"database"` // 数据库信息
+	Redis           map[string]*Redis        `toml:"redis"`
 }
 
 var App = &Config{
