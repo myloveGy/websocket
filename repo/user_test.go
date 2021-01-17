@@ -45,7 +45,6 @@ func TestUser_Create(t *testing.T) {
 			Username:    "jinxing.liu",
 			Password:    "123456",
 			AccessToken: "789123",
-			AppId:       1,
 			Phone:       "1",
 			Status:      1,
 		})
@@ -61,7 +60,6 @@ func TestUser_Create(t *testing.T) {
 			Password:    "123456",
 			Phone:       "12345678901",
 			AccessToken: "789123",
-			AppId:       1,
 		})
 
 		fmt.Println(err)
@@ -73,4 +71,17 @@ func TestUser_Delete(t *testing.T) {
 	row, err := newTestUser(t).Delete(&models.User{UserId: 100})
 	assert.NoError(t, err)
 	assert.Equal(t, int64(0), row)
+}
+
+func TestUser_ExistsPhone(t *testing.T) {
+	user := newTestUser(t)
+	assert.Equal(t, true, user.ExistsPhone("130****7932", 0))
+	assert.Equal(t, false, user.ExistsPhone("130****7932", 1))
+}
+
+func TestUser_ExistsUsername(t *testing.T) {
+	user := newTestUser(t)
+	assert.Equal(t, false, user.ExistsUsername("130****7932", 0))
+	assert.Equal(t, false, user.ExistsUsername("jinxing.liu", 1))
+	assert.Equal(t, true, user.ExistsUsername("jinxing.liu", 0))
 }

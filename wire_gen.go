@@ -9,6 +9,7 @@ import (
 	"github.com/google/wire"
 	"net/http"
 	"websocket/api/handler"
+	"websocket/api/handler/admin/app"
 	user2 "websocket/api/handler/admin/user"
 	"websocket/api/handler/api"
 	"websocket/api/handler/push"
@@ -28,8 +29,8 @@ func Initialize() *http.Server {
 	redis := connection.NewRedis()
 	userCache := cache.NewUserCache(redis)
 	mySQl := connection.NewMySQL()
-	app := repo.NewApp(mySQl)
-	middleWare := middleware.NewMiddleWare(userCache, app)
+	repoApp := repo.NewApp(mySQl)
+	middleWare := middleware.NewMiddleWare(userCache, repoApp)
 	repoUser := repo.NewUser(mySQl)
 	apiApi := api.NewApi(userCache, repoUser)
 	message := repo.NewMessage(mySQl)
@@ -37,15 +38,18 @@ func Initialize() *http.Server {
 	messageService := api2.NewMessageService(message, messageRead)
 	pushPush := push.NewPush(messageService)
 	userUser := user.NewUser()
-	ws := handler.NewWs(app, messageRead)
+	ws := handler.NewWs(repoApp, messageRead)
 	userService := api2.NewUserService(repoUser)
 	user3 := user2.NewUser(userService)
+	appService := api2.NewAppService(repoApp)
+	appApp := app.NewApp(appService)
 	handlerHandler := &handler.Handler{
 		Api:       apiApi,
 		Push:      pushPush,
 		User:      userUser,
 		Ws:        ws,
 		AdminUser: user3,
+		AdminApp:  appApp,
 	}
 	routerRouter := router.NewRouter(middleWare, handlerHandler)
 	server := NewHttp(routerRouter)
@@ -62,4 +66,4 @@ func NewHttp(router2 *router.Router) *http.Server {
 	}
 }
 
-var providerSet = wire.NewSet(connection.NewMySQL, connection.NewRedis, cache.NewUserCache, repo.NewApp, repo.NewMessage, repo.NewUser, repo.NewMessageRead, api.NewApi, push.NewPush, user.NewUser, handler.NewWs, user2.NewUser, api2.NewMessageService, api2.NewUserService, middleware.NewMiddleWare, router.NewRouter, wire.Struct(new(handler.Handler), "*"), NewHttp)
+var providerSet = wire.NewSet(connection.NewMySQL, connection.NewRedis, cache.NewUserCache, repo.NewApp, repo.NewMessage, repo.NewUser, repo.NewMessageRead, api.NewApi, push.NewPush, user.NewUser, handler.NewWs, user2.NewUser, app.NewApp, api2.NewMessageService, api2.NewUserService, api2.NewAppService, middleware.NewMiddleWare, router.NewRouter, wire.Struct(new(handler.Handler), "*"), NewHttp)

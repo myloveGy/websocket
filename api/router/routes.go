@@ -19,17 +19,19 @@ func (router *Router) Run() *gin.Engine {
 	{
 		// 用户信息
 		adminRouter.POST("/user/list", router.handler.AdminUser.List)
-		adminRouter.POST("/user/create", router.handler.AdminUser.List)
-		adminRouter.POST("/user/update", router.handler.AdminUser.List)
+		adminRouter.POST("/user/create", router.handler.AdminUser.Create)
+		adminRouter.POST("/user/update", router.handler.AdminUser.Update)
 		adminRouter.POST("/user/offline", router.handler.AdminUser.Offline)
 		adminRouter.POST("/user/online", router.handler.AdminUser.Online)
+		adminRouter.POST("/user/delete", router.handler.AdminUser.Delete)
 
 		// 应用信息
-		adminRouter.POST("/app/list", router.handler.AdminUser.List)
-		adminRouter.POST("/app/create", router.handler.AdminUser.List)
-		adminRouter.POST("/app/update", router.handler.AdminUser.List)
-		adminRouter.POST("/app/offline", router.handler.AdminUser.List)
-		adminRouter.POST("/app/online", router.handler.AdminUser.List)
+		adminRouter.POST("/app/list", router.handler.AdminApp.List)
+		adminRouter.POST("/app/create", router.handler.AdminApp.Create)
+		adminRouter.POST("/app/update", router.handler.AdminApp.Update)
+		adminRouter.POST("/app/offline", router.handler.AdminApp.Offline)
+		adminRouter.POST("/app/online", router.handler.AdminApp.Online)
+		adminRouter.POST("/app/delete", router.handler.AdminApp.Delete)
 	}
 
 	// api

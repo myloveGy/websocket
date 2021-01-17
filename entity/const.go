@@ -8,6 +8,9 @@ const (
 	SocketClose          = "close"         // 主动关闭
 	SocketMessageReceipt = "reply_message" // 消息回复
 
+	// 表中删除状态
+	TableStatusDelete = 4
+
 	// 应用状态
 	AppStatusActivate = 1 // 状态启用
 	AppStatusDisabled = 2 // 停用
@@ -17,7 +20,7 @@ const (
 	UserMessageRead   = 2 // 已经读取
 
 	UserStatusActivate = 1 // 启用
-	UserStatusDisabled = 2 // 体用
+	UserStatusDisabled = 2 // 停用
 
 	// 消息类型
 	MessageTypeTemp       = 1 // 临时消息

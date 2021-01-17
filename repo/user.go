@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"database/sql"
+	"errors"
 	"github.com/jinxing-go/mysql"
 	"websocket/models"
 )
@@ -29,6 +31,28 @@ func (u *User) FindByPhone(phone string) (*models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (u *User) ExistsPhone(phone string, userId int64) bool {
+	user := &models.User{}
+	if err := u.Builder(user).
+		Where("phone", phone).
+		Where("user_id", "!=", userId).One(); errors.Is(err, sql.ErrNoRows) {
+		return false
+	}
+
+	return true
+}
+
+func (u *User) ExistsUsername(username string, userId int64) bool {
+	user := &models.User{}
+	if err := u.Builder(user).
+		Where("username", username).
+		Where("user_id", "!=", userId).One(); errors.Is(err, sql.ErrNoRows) {
+		return false
+	}
+
+	return true
 }
 
 func (u *User) UpdateAccessToken(userId int64, accessToken string) (int64, error) {

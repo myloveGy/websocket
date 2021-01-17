@@ -1,14 +1,12 @@
 package models
 
 import (
-	"time"
-
 	"github.com/jinxing-go/mysql"
+	"time"
 )
 
 type User struct {
 	UserId      int64      `db:"user_id" json:"user_id"`
-	AppId       int64      `db:"app_id" json:"app_id"`
 	Username    string     `db:"username" json:"username"`
 	Phone       string     `db:"phone" json:"phone"`
 	Password    string     `db:"password" json:"password"`

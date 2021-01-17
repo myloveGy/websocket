@@ -1,4 +1,4 @@
-package user
+package app
 
 import (
 	"github.com/gin-gonic/gin"
@@ -9,17 +9,17 @@ import (
 	"websocket/utils"
 )
 
-type User struct {
-	userService *api.UserService
+type App struct {
+	appService *api.AppService
 }
 
-func NewUser(userService *api.UserService) *User {
-	return &User{userService: userService}
+func NewApp(appService *api.AppService) *App {
+	return &App{appService: appService}
 }
 
-func (u *User) List(c *gin.Context) {
+func (a *App) List(c *gin.Context) {
 	// 解析参数
-	params := &admin.UserSearch{}
+	params := &admin.AppSearch{}
 	if isError, err := utils.BindAndValid(c, params); isError {
 		response.InvalidParams(c, err)
 		return
@@ -34,7 +34,7 @@ func (u *User) List(c *gin.Context) {
 	}
 
 	// 查询数据
-	users, total, err := u.userService.List(params)
+	users, total, err := a.appService.List(params)
 	if err != nil {
 		response.BusinessError(c, err)
 		return

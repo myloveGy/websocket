@@ -28,7 +28,7 @@ func (m *MiddleWare) AccessToken() gin.HandlerFunc {
 		}
 
 		// 查询应用信息
-		app, err := m.appRepo.FindById(user.AppId)
+		app, err := m.appRepo.FindById(1)
 		if err != nil {
 			response.BusinessError(context, "应用信息不存在")
 			return

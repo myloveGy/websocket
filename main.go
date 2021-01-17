@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 
 	"websocket/config"
 	"websocket/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
